@@ -25,6 +25,7 @@ import System.IO
 import Network.HTTP.Req
 import Control.Monad.IO.Class
 import Requests
+import qualified RIO.ByteString   as B
 
 
 data Category = Category
@@ -87,7 +88,6 @@ exampleGet :: IO ()
 -- You can either make your monad an instance of 'MonadHttp', or use
 -- 'runReq' in any IO-enabled monad without defining new instances.
 exampleGet = runReq defaultHttpConfig $ do
-  -- let id' = pack $ show id_ <> ".json"
   response <-
     req
       GET -- method
@@ -98,20 +98,9 @@ exampleGet = runReq defaultHttpConfig $ do
       "units" =: ("e" :: String) <>
       "stationId" =: ("KMNCOONR65" :: String) <>
       "format" =: ("json" :: String)
-      -- mempty
-      -- ("param" =: (10 :: Int))
-      -- ("e1f10a1e78da46f5b10a1e78da96f525", "e" "KMNCOONR65' " "json")
   liftIO $ print (responseBody response :: Value)
+  -- pure (B.split 10 $ responseBody response)
 
-
-ex2 :: IO ()
-ex2 = runReq defaultHttpConfig $ do
-  res <- req GET
-    (https "httpbin.org" /: "bytes" /~ (3 :: Int))
-    NoReqBody
-    bsResponse
-    ("param" =: (10 :: Int))
-  liftIO $ print (responseBody res)
 
 main :: IO ()
 main = do
@@ -155,8 +144,6 @@ main = do
     examplePost
     putStrLn "get"
     exampleGet
-    putStrLn "get"
-    ex2
     -- getSeriesRequest 10
 
 

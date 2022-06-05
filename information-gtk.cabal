@@ -37,6 +37,7 @@ library
     , mtl
     , process
     , req
+    , rio
     , servant
     , servant-server
     , text
@@ -68,6 +69,7 @@ executable information-gtk
     , mtl
     , process
     , req
+    , rio
     , servant
     , servant-server
     , text
@@ -99,6 +101,7 @@ test-suite information-gtk-test
     , mtl
     , process
     , req
+    , rio
     , servant
     , servant-server
     , text

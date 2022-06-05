@@ -38,6 +38,7 @@ dependencies:
 - req
 - mtl
 - transformers
+- rio
 
 library:
   source-dirs: src
