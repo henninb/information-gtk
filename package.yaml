@@ -28,6 +28,8 @@ dependencies:
 - process
 - unix
 - text
+- aeson
+- aeson-casing
 
 library:
   source-dirs: src
