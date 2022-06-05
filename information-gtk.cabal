@@ -19,6 +19,7 @@ source-repository head
 library
   exposed-modules:
       Main
+      Requests
   other-modules:
       Paths_information_gtk
   hs-source-dirs:
@@ -33,11 +34,13 @@ library
     , gi-gtk-hs
     , haskell-gi-base
     , lens-aeson
+    , mtl
     , process
     , req
     , servant
     , servant-server
     , text
+    , transformers
     , unix
     , wai
     , warp
@@ -46,6 +49,7 @@ library
 executable information-gtk
   main-is: Main.hs
   other-modules:
+      Requests
       Paths_information_gtk
   hs-source-dirs:
       src
@@ -61,11 +65,13 @@ executable information-gtk
     , haskell-gi-base
     , information-gtk
     , lens-aeson
+    , mtl
     , process
     , req
     , servant
     , servant-server
     , text
+    , transformers
     , unix
     , wai
     , warp
@@ -90,11 +96,13 @@ test-suite information-gtk-test
     , haskell-gi-base
     , information-gtk
     , lens-aeson
+    , mtl
     , process
     , req
     , servant
     , servant-server
     , text
+    , transformers
     , unix
     , wai
     , warp

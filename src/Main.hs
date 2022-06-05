@@ -17,12 +17,14 @@ import Data.Text as Text
 import Data.Char (chr)
 import Data.Aeson
 import GHC.Generics
-import Network.Wai
-import Network.Wai.Handler.Warp
+import Data.String ( fromString )
+-- import Network.Wai
+-- import Network.Wai.Handler.Warp
 -- import Servant
 import System.IO
 import Network.HTTP.Req
 import Control.Monad.IO.Class
+import Requests
 
 
 data Category = Category
@@ -36,6 +38,28 @@ data Category = Category
 --   :<|> "category" :> Capture "id" Integer :> Get '[JSON] Category
 --   :<|> "optional" :> QueryParam "parameter1" Int :> Get '[JSON] String  -- equivalent to 'GET /optional?parameter1=test'
 
+newtype GetSeriesResponse = GetSeriesResponse {
+  seriesName :: String
+} deriving (Show)
+
+instance FromJSON GetSeriesResponse where
+  parseJSON = withObject
+    ""
+    (\o -> GetSeriesResponse <$> (o .: "data" >>= flip (.:) "seriesName"))
+
+
+getSeriesRequest :: Int -> Request NoReqBody GetSeriesResponse GET
+getSeriesRequest seriesId =
+  Request NoReqBody GET [] $ https "api.thetvdb.com" /: "series" /: fromString
+    (show seriesId)
+
+-- getEpisodesRequest :: Int -> Int -> Request NoReqBody Category GET
+-- getEpisodesRequest seriesId page =
+--   Request NoReqBody GET [("page", show page)]
+--     $  https "api.thetvdb.com"
+--     /: "series"
+--     /: fromString (show seriesId)
+--     /: "episodes"
 
 examplePost :: IO ()
 -- You can either make your monad an instance of 'MonadHttp', or use
@@ -55,6 +79,7 @@ examplePost = runReq defaultHttpConfig $ do
       (ReqBodyJson payload) -- use built-in options or add your own
       jsonResponse -- specify how to interpret response
       mempty -- query params, headers, explicit port number, etc.
+      -- return $ ok (responseBody res :: Status)
   liftIO $ print (responseBody response :: Value)
 
 
@@ -62,14 +87,31 @@ exampleGet :: IO ()
 -- You can either make your monad an instance of 'MonadHttp', or use
 -- 'runReq' in any IO-enabled monad without defining new instances.
 exampleGet = runReq defaultHttpConfig $ do
+  -- let id' = pack $ show id_ <> ".json"
   response <-
     req
       GET -- method
-      (https "httpbin.org" /: "get")
+      (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current")
       NoReqBody
-      jsonResponse -- specify how to interpret response
-      mempty -- query params, headers, explicit port number, etc.
+      jsonResponse $
+      "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+      "units" =: ("e" :: String) <>
+      "stationId" =: ("KMNCOONR65" :: String) <>
+      "format" =: ("json" :: String)
+      -- mempty
+      -- ("param" =: (10 :: Int))
+      -- ("e1f10a1e78da46f5b10a1e78da96f525", "e" "KMNCOONR65' " "json")
   liftIO $ print (responseBody response :: Value)
+
+
+ex2 :: IO ()
+ex2 = runReq defaultHttpConfig $ do
+  res <- req GET
+    (https "httpbin.org" /: "bytes" /~ (3 :: Int))
+    NoReqBody
+    bsResponse
+    ("param" =: (10 :: Int))
+  liftIO $ print (responseBody res)
 
 main :: IO ()
 main = do
@@ -109,10 +151,13 @@ main = do
   Gtk.buttonSetImage btn2 $ Just img2
   Gtk.widgetSetHexpand btn2 False
   on btn2 #clicked $ do
-    putStrLn "User choose: weather"
-    -- callCommand $ "weather-minneapolis"
+    putStrLn "post"
     examplePost
+    putStrLn "get"
     exampleGet
+    putStrLn "get"
+    ex2
+    -- getSeriesRequest 10
 
 
     -- Gtk.mainQuit

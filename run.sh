@@ -5,5 +5,6 @@ mkdir -p src
 
 stack build
 stack install
+stack run
 
 exit 0
