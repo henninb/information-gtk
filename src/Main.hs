@@ -22,16 +22,22 @@ import Data.String ( fromString )
 -- import Network.Wai.Handler.Warp
 -- import Servant
 import System.IO
-import Network.HTTP.Req
+import Network.HTTP.Req as Req
 import Control.Monad.IO.Class
 import Requests
-import qualified RIO.ByteString   as B
+-- import qualified RIO.ByteString   as B
 
 
 data Category = Category
     {category :: String,
     categoryId  :: Integer
     } deriving (Show, Generic, Eq, ToJSON, FromJSON)
+
+data Status = Status { ok :: Bool }
+    deriving (Generic)
+
+instance FromJSON Status
+
 
 -- type CategoryApi =
 --   Get '[JSON] String
@@ -99,7 +105,7 @@ exampleGet = runReq defaultHttpConfig $ do
       "stationId" =: ("KMNCOONR65" :: String) <>
       "format" =: ("json" :: String)
   liftIO $ print (responseBody response :: Value)
-  -- pure (B.split 10 $ responseBody response)
+  -- return $ ok (responseBody response :: Status)
 
 
 main :: IO ()
