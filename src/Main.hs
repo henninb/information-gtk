@@ -2,6 +2,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric  #-}
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE TypeOperators #-}
+ {-# LANGUAGE DataKinds #-}
 
 module Main where
 
@@ -15,6 +17,12 @@ import Data.Text as Text
 import Data.Char (chr)
 import Data.Aeson
 import GHC.Generics
+import Network.Wai
+import Network.Wai.Handler.Warp
+-- import Servant
+import System.IO
+import Network.HTTP.Req
+import Control.Monad.IO.Class
 
 
 data Category = Category
@@ -22,8 +30,46 @@ data Category = Category
     categoryId  :: Integer
     } deriving (Show, Generic, Eq, ToJSON, FromJSON)
 
--- instance FromRow Category
--- instance ToRow Category
+-- type CategoryApi =
+--   Get '[JSON] String
+--   :<|> "category" :> Get '[JSON] [Category]
+--   :<|> "category" :> Capture "id" Integer :> Get '[JSON] Category
+--   :<|> "optional" :> QueryParam "parameter1" Int :> Get '[JSON] String  -- equivalent to 'GET /optional?parameter1=test'
+
+
+examplePost :: IO ()
+-- You can either make your monad an instance of 'MonadHttp', or use
+-- 'runReq' in any IO-enabled monad without defining new instances.
+examplePost = runReq defaultHttpConfig $ do
+  let payload =
+        object
+          [ "foo" .= (10 :: Int),
+            "bar" .= (20 :: Int)
+          ]
+  -- One function—full power and flexibility, automatic retrying on timeouts
+  -- and such, automatic connection sharing.
+  response <-
+    req
+      POST -- method
+      (https "httpbin.org" /: "post") -- safe by construction URL
+      (ReqBodyJson payload) -- use built-in options or add your own
+      jsonResponse -- specify how to interpret response
+      mempty -- query params, headers, explicit port number, etc.
+  liftIO $ print (responseBody response :: Value)
+
+
+exampleGet :: IO ()
+-- You can either make your monad an instance of 'MonadHttp', or use
+-- 'runReq' in any IO-enabled monad without defining new instances.
+exampleGet = runReq defaultHttpConfig $ do
+  response <-
+    req
+      GET -- method
+      (https "httpbin.org" /: "get")
+      NoReqBody
+      jsonResponse -- specify how to interpret response
+      mempty -- query params, headers, explicit port number, etc.
+  liftIO $ print (responseBody response :: Value)
 
 main :: IO ()
 main = do
@@ -50,21 +96,6 @@ main = do
   label2 <- Gtk.labelNew Nothing
   Gtk.labelSetMarkup label2 "<b>Weather</b>"
 
-  label3 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label3 "<b>Reboot</b>"
-
-  label4 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label4 "<b>Shutdown</b>"
-
-  label5 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label5 "<b>Suspend</b>"
-
-  label6 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label6 "<b>Hibernate</b>"
-
-  label7 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label7 "<b>Lock</b>"
-
   btn1 <- Gtk.buttonNew
   Gtk.buttonSetRelief btn1 Gtk.ReliefStyleNone
   Gtk.buttonSetImage btn1 $ Just img1
@@ -79,7 +110,9 @@ main = do
   Gtk.widgetSetHexpand btn2 False
   on btn2 #clicked $ do
     putStrLn "User choose: weather"
-    callCommand $ "weather-minneapolis"
+    -- callCommand $ "weather-minneapolis"
+    examplePost
+    exampleGet
 
 
     -- Gtk.mainQuit

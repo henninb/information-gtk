@@ -30,6 +30,12 @@ dependencies:
 - text
 - aeson
 - aeson-casing
+- servant
+- servant-server
+- wai
+- warp
+- lens-aeson
+- req
 
 library:
   source-dirs: src

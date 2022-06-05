@@ -32,9 +32,15 @@ library
     , gi-gtk ==3.0.*
     , gi-gtk-hs
     , haskell-gi-base
+    , lens-aeson
     , process
+    , req
+    , servant
+    , servant-server
     , text
     , unix
+    , wai
+    , warp
   default-language: Haskell2010
 
 executable information-gtk
@@ -54,9 +60,15 @@ executable information-gtk
     , gi-gtk-hs
     , haskell-gi-base
     , information-gtk
+    , lens-aeson
     , process
+    , req
+    , servant
+    , servant-server
     , text
     , unix
+    , wai
+    , warp
   default-language: Haskell2010
 
 test-suite information-gtk-test
@@ -77,7 +89,13 @@ test-suite information-gtk-test
     , gi-gtk-hs
     , haskell-gi-base
     , information-gtk
+    , lens-aeson
     , process
+    , req
+    , servant
+    , servant-server
     , text
     , unix
+    , wai
+    , warp
   default-language: Haskell2010
