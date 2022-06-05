@@ -68,6 +68,13 @@ getSeriesRequest seriesId =
 --     /: fromString (show seriesId)
 --     /: "episodes"
 
+-- getMoves IO Value :: IO Value
+getMoves mv = do
+  -- mv <- decode <$> B.readFile "moves.json"
+  case mv of
+    Nothing -> error "invalid JSON"
+    Just v -> return v
+
 examplePost :: IO ()
 -- You can either make your monad an instance of 'MonadHttp', or use
 -- 'runReq' in any IO-enabled monad without defining new instances.
