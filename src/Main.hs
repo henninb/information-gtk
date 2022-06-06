@@ -105,29 +105,11 @@ data Observation  = Observation {
   imperial :: Imperial
 } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
--- data Observations = Observations {
---   observations :: [Observation]
--- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
-
-
--- type Observations a = Array Observation a
-
--- data Category = Category
---     {foo :: Integer,
---     bar  :: Integer
--- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
-
 data Status = Status { ok :: Bool }
     deriving (Generic)
 
 instance FromJSON Status
 
-
--- type CategoryApi =
---   Get '[JSON] String
---   :<|> "category" :> Get '[JSON] [Category]
---   :<|> "category" :> Capture "id" Integer :> Get '[JSON] Category
---   :<|> "optional" :> QueryParam "parameter1" Int :> Get '[JSON] String  -- equivalent to 'GET /optional?parameter1=test'
 
 newtype GetSeriesResponse = GetSeriesResponse {
   seriesName :: String
@@ -141,21 +123,12 @@ instance FromJSON GetSeriesResponse where
 
 exampleObservation = "{\"observations\":[{\"stationID\":\"KMNCOONR65\",\"obsTimeUtc\":\"2022-06-05T20:18:00Z\",\"obsTimeLocal\":\"2022-06-05 15:18:00\",\"neighborhood\":\"Thompson Heights\",\"softwareType\":null,\"country\":\"US\",\"solarRadiation\":57.3,\"lon\":-93.306,\"realtimeFrequency\":null,\"epoch\":1654460280,\"lat\":45.193,\"uv\":0.0,\"winddir\":187,\"humidity\":53,\"qcStatus\":1,\"imperial\":{\"temp\":71,\"heatIndex\":70,\"dewpt\":53,\"windChill\":71,\"windSpeed\":3,\"windGust\":3,\"pressure\":29.76,\"precipRate\":0.00,\"precipTotal\":0.00,\"elev\":863}}]}"
 
--- eitherObsersation = eitherDecode exampleObservation :: Either String Observation
--- exampleCategory :: String
--- exampleCategory = "{ \"foo\": 1, \"bar\": 2 }"
-
--- eitherCategory = eitherDecode exampleCategory :: Either String Category
-
-
 jsonFile :: FilePath
 jsonFile = "example.json"
 
 getJSON :: IO B.ByteString
 getJSON = B.readFile jsonFile
 
--- exampleObservation1 = "{\"observations\": [{ \"stationID\": \"abc\", \"obsTimeUtc\": \"2022-06-05T20:18:00Z\" }]}"
--- exampleObservation1 = "[{ \"stationID\": \"abc\", \"obsTimeUtc\": \"2022-06-05T20:18:00Z\", \"junk\":1, \"imperial\":{\"temp\":71}}]"
 exampleObservation1 = "[{\"stationID\":\"KMNCOONR65\",\"obsTimeUtc\":\"2022-06-05T20:18:00Z\",\"obsTimeLocal\":\"2022-06-05 15:18:00\",\"neighborhood\":\"Thompson Heights\",\"softwareType\":null,\"country\":\"US\",\"solarRadiation\":57.3,\"lon\":-93.306,\"realtimeFrequency\":null,\"epoch\":1654460280,\"lat\":45.193,\"uv\":0.0,\"winddir\":187,\"humidity\":53,\"qcStatus\":1,\"imperial\":{\"temp\":71,\"heatIndex\":70,\"dewpt\":53,\"windChill\":71,\"windSpeed\":3,\"windGust\":3,\"pressure\":29.76,\"precipRate\":0.00,\"precipTotal\":0.00,\"elev\":863}}]"
 eitherObsersation1 = eitherDecode exampleObservation1 :: Either String [Observation]
 -- eitherObsersation1 = eitherDecode exampleObservation1 :: Either String Observations
