@@ -15,7 +15,6 @@ import qualified GI.Gdk as GDK
 import System.Directory
 import System.Posix.User
 import System.Process
--- import Data.Text as Text
 import Data.Char (chr)
 import Data.Aeson
 import GHC.Generics
@@ -88,12 +87,6 @@ data Imperial = Imperial {
   elev :: Integer
 } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
--- data Observation  = Observation {
---   stationID :: String,
---   obsTimeUtc :: String,
---   imperial :: Object
--- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
-
 data Observation  = Observation {
   stationID :: String,
   obsTimeUtc :: String,
@@ -112,17 +105,17 @@ data Observation  = Observation {
   imperial :: Imperial
 } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
-data Observations = Observations {
-  observations :: [Observation]
-} deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+-- data Observations = Observations {
+--   observations :: [Observation]
+-- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
 
 -- type Observations a = Array Observation a
 
-data Category = Category
-    {foo :: Integer,
-    bar  :: Integer
-} deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+-- data Category = Category
+--     {foo :: Integer,
+--     bar  :: Integer
+-- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
 data Status = Status { ok :: Bool }
     deriving (Generic)
@@ -277,19 +270,6 @@ exampleGet = runReq defaultHttpConfig $ do
   liftIO $ print (responseBody response :: Value)
   -- return $ ok (responseBody response :: Status)
 
--- exampleGetNew = runReq defaultHttpConfig $ do
---   response <-
---     req
---       GET -- method
---       (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current")
---       NoReqBody
---       jsonResponse $
---       "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
---       "units" =: ("e" :: String) <>
---       "stationId" =: ("KMNCOONR65" :: String) <>
---       "format" =: ("json" :: String)
---     return $ ok (responseBody response :: Status)
-  -- liftIO $ print (responseBody response :: Value)
 
 main :: IO ()
 main = do
