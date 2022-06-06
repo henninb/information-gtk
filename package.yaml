@@ -38,7 +38,10 @@ dependencies:
 - req
 - mtl
 - transformers
-- rio
+- hashmap
+- bytestring
+- json
+# - rio
 
 library:
   source-dirs: src

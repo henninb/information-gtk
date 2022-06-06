@@ -1,0 +1,31 @@
+[
+    {
+      "stationID": "KMNCOONR65",
+      "obsTimeUtc": "2022-06-05T20:18:00Z",
+      "obsTimeLocal": "2022-06-05 15:18:00",
+      "neighborhood": "Thompson Heights",
+      "softwareType": null,
+      "country": "US",
+      "solarRadiation": 57.3,
+      "lon": -93.306,
+      "realtimeFrequency": null,
+      "epoch": 1654460280,
+      "lat": 45.193,
+      "uv": 0,
+      "winddir": 187,
+      "humidity": 53,
+      "qcStatus": 1,
+      "imperial": {
+        "temp": 71,
+        "heatIndex": 70,
+        "dewpt": 53,
+        "windChill": 71,
+        "windSpeed": 3,
+        "windGust": 3,
+        "pressure": 29.76,
+        "precipRate": 0,
+        "precipTotal": 0,
+        "elev": 863
+      }
+    }
+]

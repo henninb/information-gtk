@@ -28,16 +28,18 @@ library
       aeson
     , aeson-casing
     , base >=4.7 && <5
+    , bytestring
     , directory
     , gi-gdk
     , gi-gtk ==3.0.*
     , gi-gtk-hs
+    , hashmap
     , haskell-gi-base
+    , json
     , lens-aeson
     , mtl
     , process
     , req
-    , rio
     , servant
     , servant-server
     , text
@@ -59,17 +61,19 @@ executable information-gtk
       aeson
     , aeson-casing
     , base >=4.7 && <5
+    , bytestring
     , directory
     , gi-gdk
     , gi-gtk ==3.0.*
     , gi-gtk-hs
+    , hashmap
     , haskell-gi-base
     , information-gtk
+    , json
     , lens-aeson
     , mtl
     , process
     , req
-    , rio
     , servant
     , servant-server
     , text
@@ -91,17 +95,19 @@ test-suite information-gtk-test
       aeson
     , aeson-casing
     , base >=4.7 && <5
+    , bytestring
     , directory
     , gi-gdk
     , gi-gtk ==3.0.*
     , gi-gtk-hs
+    , hashmap
     , haskell-gi-base
     , information-gtk
+    , json
     , lens-aeson
     , mtl
     , process
     , req
-    , rio
     , servant
     , servant-server
     , text

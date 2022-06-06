@@ -3,7 +3,8 @@
 {-# LANGUAGE DeriveGeneric  #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE TypeOperators #-}
- {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 
 module Main where
 
@@ -13,7 +14,7 @@ import qualified GI.Gdk as GDK
 import System.Directory
 import System.Posix.User
 import System.Process
-import Data.Text as Text
+-- import Data.Text as Text
 import Data.Char (chr)
 import Data.Aeson
 import GHC.Generics
@@ -25,13 +26,62 @@ import System.IO
 import Network.HTTP.Req as Req
 import Control.Monad.IO.Class
 import Requests
+import Data.HashMap
 -- import qualified RIO.ByteString   as B
+import qualified Data.ByteString.Lazy as B
+import Text.JSON.Generic
+-- import qualified Handlers.Logger            as L
 
+-- data Imperial = Imperial {
+--   temp :: Integer
+-- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+
+
+data Imperial = Imperial {
+  temp :: Integer,
+  heatIndex :: Integer,
+  dewpt :: Integer,
+  windChill :: Integer,
+  windSpeed :: Integer,
+  windGust :: Integer,
+  pressure :: Double,
+  precipRate :: Integer,
+  precipTotal :: Integer,
+  elev :: Integer
+} deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+
+-- data Observation  = Observation {
+--   stationID :: String,
+--   obsTimeUtc :: String,
+--   imperial :: Object
+-- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+
+data Observation  = Observation {
+  stationID :: String,
+  obsTimeUtc :: String,
+  neighborhood :: String,
+  -- softwareType :: String,
+  country:: String,
+  solarRadiation :: Double,
+  lon :: Double,
+  -- realtimeFrequency :: String,
+  epoch :: Integer,
+  lat :: Double,
+  uv :: Integer,
+  winddir :: Integer,
+  humidity :: Integer,
+  qcStatus :: Integer,
+  imperial :: Imperial
+} deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+
+data Observations = Observations {
+  observations :: Observations
+} deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
 data Category = Category
-    {category :: String,
-    categoryId  :: Integer
-    } deriving (Show, Generic, Eq, ToJSON, FromJSON)
+    {foo :: Integer,
+    bar  :: Integer
+} deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
 data Status = Status { ok :: Bool }
     deriving (Generic)
@@ -53,6 +103,79 @@ instance FromJSON GetSeriesResponse where
   parseJSON = withObject
     ""
     (\o -> GetSeriesResponse <$> (o .: "data" >>= flip (.:) "seriesName"))
+
+
+exampleObservation = "{\"observations\":[{\"stationID\":\"KMNCOONR65\",\"obsTimeUtc\":\"2022-06-05T20:18:00Z\",\"obsTimeLocal\":\"2022-06-05 15:18:00\",\"neighborhood\":\"Thompson Heights\",\"softwareType\":null,\"country\":\"US\",\"solarRadiation\":57.3,\"lon\":-93.306,\"realtimeFrequency\":null,\"epoch\":1654460280,\"lat\":45.193,\"uv\":0.0,\"winddir\":187,\"humidity\":53,\"qcStatus\":1,\"imperial\":{\"temp\":71,\"heatIndex\":70,\"dewpt\":53,\"windChill\":71,\"windSpeed\":3,\"windGust\":3,\"pressure\":29.76,\"precipRate\":0.00,\"precipTotal\":0.00,\"elev\":863}}]}"
+
+eitherObsersation = eitherDecode exampleObservation :: Either String Observation
+-- exampleCategory :: String
+exampleCategory = "{ \"foo\": 1, \"bar\": 2 }"
+
+eitherCategory = eitherDecode exampleCategory :: Either String Category
+
+
+jsonFile :: FilePath
+jsonFile = "example.json"
+
+getJSON :: IO B.ByteString
+getJSON = B.readFile jsonFile
+
+-- exampleObservation1 = "{\"observations\": [{ \"stationID\": \"abc\", \"obsTimeUtc\": \"2022-06-05T20:18:00Z\" }]}"
+-- exampleObservation1 = "[{ \"stationID\": \"abc\", \"obsTimeUtc\": \"2022-06-05T20:18:00Z\", \"junk\":1, \"imperial\":{\"temp\":71}}]"
+exampleObservation1 = "[{\"stationID\":\"KMNCOONR65\",\"obsTimeUtc\":\"2022-06-05T20:18:00Z\",\"obsTimeLocal\":\"2022-06-05 15:18:00\",\"neighborhood\":\"Thompson Heights\",\"softwareType\":null,\"country\":\"US\",\"solarRadiation\":57.3,\"lon\":-93.306,\"realtimeFrequency\":null,\"epoch\":1654460280,\"lat\":45.193,\"uv\":0.0,\"winddir\":187,\"humidity\":53,\"qcStatus\":1,\"imperial\":{\"temp\":71,\"heatIndex\":70,\"dewpt\":53,\"windChill\":71,\"windSpeed\":3,\"windGust\":3,\"pressure\":29.76,\"precipRate\":0.00,\"precipTotal\":0.00,\"elev\":863}}]"
+eitherObsersation1 = eitherDecode exampleObservation1 :: Either String [Observation]
+
+-- loadApiConfigs :: IO Observation
+-- loadApiConfigs = do
+--     config <- (eitherDecode <$> getJSON) :: IO (Either String Observation)
+--     print config
+--     -- print "gothere"
+--     -- liftIO (print config)
+--     -- print "gothere"
+--     case config of
+--         Left _ -> empty
+--         Right x -> return x
+
+-- parse :: FromJSON a => ByteString -> Maybe [Either Value a]
+-- parse s = case decode s of
+--   Nothing -> fail "could not decode as array"
+--   Just values -> map tryDecode values
+-- where
+--   tryDecode :: FromJSON a =>Value -> Either Value a
+--   tryDecode v = case decode (encode v) of
+--     Nothing -> Left v
+--     Just a -> Right a
+
+-- parseResponse :: (FromJSON response, MonadThrow m, Show response) => L.Handle m -> B.ByteString -> m response
+-- parseResponse hLogger respBody = case eitherDecode respBody of
+--     Right result -> do
+--         L.debug hLogger (show result)
+--         return result
+--     Left e     -> do
+--         L.error hLogger $ ("Parsing failed due to mismatching type, error:\n\t" <> fromString e <> "\n") <> BC.unpack respBody
+--         throwM $ RParseException . WrongType . fromString $ e
+
+-- test =
+--   case eitherDecode exampleObservation of
+--     Right ret -> do
+--       debug $ "Observation returned perms: " ++ (show ret)
+--       return ret
+--     Left (err2 :: String) -> do
+--       debug $ "Keycloak parse error: " ++ (show err2)
+--       throwError $ ParseError $ pack (show err2)
+
+-- test :: Either String Category
+-- test = eitherDecode exampleJson
+
+-- getExtra :: Object -> Parser Object
+-- getExtra v = do
+--   mextra <- v .:? "extra"
+--   case mextra of
+--     Just vv -> vv & withArray "Abc.extra" (\arr -> do
+--       let vallst = toList arr
+--       objlst <- traverse (withObject "Abc.extra[..]" pure) vallst
+--       return $ HashMap.unions objlst)
+--     Nothing -> return HashMap.empty
 
 
 getSeriesRequest :: Int -> Request NoReqBody GetSeriesResponse GET
@@ -98,8 +221,6 @@ examplePost = runReq defaultHttpConfig $ do
 
 
 exampleGet :: IO ()
--- You can either make your monad an instance of 'MonadHttp', or use
--- 'runReq' in any IO-enabled monad without defining new instances.
 exampleGet = runReq defaultHttpConfig $ do
   response <-
     req
@@ -114,6 +235,19 @@ exampleGet = runReq defaultHttpConfig $ do
   liftIO $ print (responseBody response :: Value)
   -- return $ ok (responseBody response :: Status)
 
+-- exampleGetNew = runReq defaultHttpConfig $ do
+--   response <-
+--     req
+--       GET -- method
+--       (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current")
+--       NoReqBody
+--       jsonResponse $
+--       "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+--       "units" =: ("e" :: String) <>
+--       "stationId" =: ("KMNCOONR65" :: String) <>
+--       "format" =: ("json" :: String)
+--     return $ ok (responseBody response :: Status)
+  -- liftIO $ print (responseBody response :: Value)
 
 main :: IO ()
 main = do
@@ -157,9 +291,6 @@ main = do
     examplePost
     putStrLn "get"
     exampleGet
-    -- getSeriesRequest 10
-
-
     -- Gtk.mainQuit
 
   on win #keyPressEvent $ \keyEvent -> do
@@ -183,19 +314,28 @@ main = do
   #attach grid label1 0 1 1 1
   #attach grid btn2   1 0 1 1
   #attach grid label2 1 1 1 1
-  -- #attach grid btn3   2 0 1 1
-  -- #attach grid label3 2 1 1 1
-  -- #attach grid btn4   3 0 1 1
-  -- #attach grid label4 3 1 1 1
-  -- -- #attach grid btn5   4 0 1 1
-  -- -- #attach grid label5 4 1 1 1
-  -- -- #attach grid btn6   5 0 1 1
-  -- -- #attach grid label6 5 1 1 1
-  -- #attach grid btn7   6 0 1 1
-  -- #attach grid label7 6 1 1 1
 
   #add win grid
 
   Gtk.onWidgetDestroy win Gtk.mainQuit
   #showAll win
+  let Right unwrappedCategory = eitherCategory
+  print unwrappedCategory
+
+  putStrLn $ "load configs"
+  let Right unwrappedObservation1 = eitherObsersation1
+  print (unwrappedObservation1)
+  -- print (length unwrappedObservation1)
+  -- let record = (head unwrappedObservation1)
+  -- print $ imperial record
+  -- let myImperial = imperial record
+  -- print $ temp $ imperial record
+  putStrLn $ "load configs"
+  -- let Right unwrappedObservation = eitherObsersation
+  -- print unwrappedObservation
+  -- debug $ "Keycloak returned perms: " ++ (show unwrappedObservation)
+  -- x <- decode exampleObservation :: Maybe Observation
+  -- print x
+  -- liftIO (getSeriesRequest)
+
   Gtk.main

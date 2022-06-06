@@ -3,7 +3,7 @@
 mkdir -p src
 # stack run
 
-stack build
+# stack build
 stack install
 stack run
 
