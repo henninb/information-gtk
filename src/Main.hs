@@ -75,8 +75,11 @@ data Observation  = Observation {
 } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
 data Observations = Observations {
-  observations :: Observations
+  observations :: [Observation]
 } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+
+
+-- type Observations a = Array Observation a
 
 data Category = Category
     {foo :: Integer,
@@ -107,11 +110,11 @@ instance FromJSON GetSeriesResponse where
 
 exampleObservation = "{\"observations\":[{\"stationID\":\"KMNCOONR65\",\"obsTimeUtc\":\"2022-06-05T20:18:00Z\",\"obsTimeLocal\":\"2022-06-05 15:18:00\",\"neighborhood\":\"Thompson Heights\",\"softwareType\":null,\"country\":\"US\",\"solarRadiation\":57.3,\"lon\":-93.306,\"realtimeFrequency\":null,\"epoch\":1654460280,\"lat\":45.193,\"uv\":0.0,\"winddir\":187,\"humidity\":53,\"qcStatus\":1,\"imperial\":{\"temp\":71,\"heatIndex\":70,\"dewpt\":53,\"windChill\":71,\"windSpeed\":3,\"windGust\":3,\"pressure\":29.76,\"precipRate\":0.00,\"precipTotal\":0.00,\"elev\":863}}]}"
 
-eitherObsersation = eitherDecode exampleObservation :: Either String Observation
+-- eitherObsersation = eitherDecode exampleObservation :: Either String Observation
 -- exampleCategory :: String
-exampleCategory = "{ \"foo\": 1, \"bar\": 2 }"
+-- exampleCategory = "{ \"foo\": 1, \"bar\": 2 }"
 
-eitherCategory = eitherDecode exampleCategory :: Either String Category
+-- eitherCategory = eitherDecode exampleCategory :: Either String Category
 
 
 jsonFile :: FilePath
@@ -124,6 +127,7 @@ getJSON = B.readFile jsonFile
 -- exampleObservation1 = "[{ \"stationID\": \"abc\", \"obsTimeUtc\": \"2022-06-05T20:18:00Z\", \"junk\":1, \"imperial\":{\"temp\":71}}]"
 exampleObservation1 = "[{\"stationID\":\"KMNCOONR65\",\"obsTimeUtc\":\"2022-06-05T20:18:00Z\",\"obsTimeLocal\":\"2022-06-05 15:18:00\",\"neighborhood\":\"Thompson Heights\",\"softwareType\":null,\"country\":\"US\",\"solarRadiation\":57.3,\"lon\":-93.306,\"realtimeFrequency\":null,\"epoch\":1654460280,\"lat\":45.193,\"uv\":0.0,\"winddir\":187,\"humidity\":53,\"qcStatus\":1,\"imperial\":{\"temp\":71,\"heatIndex\":70,\"dewpt\":53,\"windChill\":71,\"windSpeed\":3,\"windGust\":3,\"pressure\":29.76,\"precipRate\":0.00,\"precipTotal\":0.00,\"elev\":863}}]"
 eitherObsersation1 = eitherDecode exampleObservation1 :: Either String [Observation]
+-- eitherObsersation1 = eitherDecode exampleObservation1 :: Either String Observations
 
 -- loadApiConfigs :: IO Observation
 -- loadApiConfigs = do
@@ -319,12 +323,11 @@ main = do
 
   Gtk.onWidgetDestroy win Gtk.mainQuit
   #showAll win
-  let Right unwrappedCategory = eitherCategory
-  print unwrappedCategory
+  -- let Right unwrappedCategory = eitherCategory
+  -- print unwrappedCategory
 
-  putStrLn $ "load configs"
   let Right unwrappedObservation1 = eitherObsersation1
-  print (unwrappedObservation1)
+  print $ unwrappedObservation1
   -- print (length unwrappedObservation1)
   -- let record = (head unwrappedObservation1)
   -- print $ imperial record
