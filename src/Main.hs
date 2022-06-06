@@ -5,6 +5,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 module Main where
 
@@ -30,12 +31,49 @@ import Data.HashMap
 -- import qualified RIO.ByteString   as B
 import qualified Data.ByteString.Lazy as B
 import Text.JSON.Generic
+import qualified Data.Aeson.Schema as DAS
+import qualified Data.Text as T
 -- import qualified Handlers.Logger            as L
 
 -- data Imperial = Imperial {
 --   temp :: Integer
 -- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
+-- First, define the schema of the JSON data
+type MySchema = [DAS.schema|
+ {
+  observations: List
+    {
+      stationID: Text,
+      obsTimeUtc: Text,
+      obsTimeLocal: Text,
+      neighborhood: Text,
+      softwareType: Maybe Text,
+      country: Text,
+      solarRadiation: Float,
+      lon: Float,
+      realtimeFrequency: Maybe Int,
+      epoch: Int,
+      lat: Float,
+      uv: Int,
+      winddir: Int,
+      humidity: Int,
+      qcStatus: Int,
+      imperial: {
+        temp: Int,
+        heatIndex: Int,
+        dewpt: Int,
+        windChill: Int,
+        windSpeed: Int,
+        windGust: Int,
+        pressure: Float,
+        precipRate: Int,
+        precipTotal: Float,
+        elev: Int
+      }
+    }
+}
+|]
 
 data Imperial = Imperial {
   temp :: Integer,
@@ -334,6 +372,12 @@ main = do
   -- let myImperial = imperial record
   -- print $ temp $ imperial record
   putStrLn $ "load configs"
+  obj <- either fail return =<<
+    eitherDecodeFileStrict "example.json" :: IO (DAS.Object MySchema)
+
+    -- print all the users' ids
+  -- print [DAS.get| obj.users[].id |]
+  print [DAS.get| obj.observations[].stationID |]
   -- let Right unwrappedObservation = eitherObsersation
   -- print unwrappedObservation
   -- debug $ "Keycloak returned perms: " ++ (show unwrappedObservation)

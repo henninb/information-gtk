@@ -41,6 +41,8 @@ dependencies:
 - hashmap
 - bytestring
 - json
+- aeson-schemas
+# - aeson-schemas >= 0.4
 # - rio
 
 library:

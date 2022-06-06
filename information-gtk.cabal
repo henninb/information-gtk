@@ -27,6 +27,7 @@ library
   build-depends:
       aeson
     , aeson-casing
+    , aeson-schemas
     , base >=4.7 && <5
     , bytestring
     , directory
@@ -60,6 +61,7 @@ executable information-gtk
   build-depends:
       aeson
     , aeson-casing
+    , aeson-schemas
     , base >=4.7 && <5
     , bytestring
     , directory
@@ -94,6 +96,7 @@ test-suite information-gtk-test
   build-depends:
       aeson
     , aeson-casing
+    , aeson-schemas
     , base >=4.7 && <5
     , bytestring
     , directory
