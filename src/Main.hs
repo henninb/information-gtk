@@ -17,6 +17,7 @@ import System.Posix.User
 import System.Process
 import Data.Char (chr)
 import Data.Aeson
+import Data.Aeson.Types
 import GHC.Generics
 import Data.String ( fromString )
 -- import Network.Wai
@@ -25,7 +26,7 @@ import Data.String ( fromString )
 import System.IO
 import Network.HTTP.Req as Req
 import Control.Monad.IO.Class
-import Requests
+-- import Requests
 import Data.HashMap
 -- import qualified RIO.ByteString   as B
 import qualified Data.ByteString.Lazy as B
@@ -40,6 +41,12 @@ import qualified Network.HTTP.Client as HTTPClient
 -- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
 -- First, define the schema of the JSON data
+
+data Person = Person
+  { firstName :: String
+  , lastName  :: String
+  } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+
 type MySchema = [DAS.schema|
  {
   observations: List
@@ -77,7 +84,7 @@ type MySchema = [DAS.schema|
 
 newtype Observations = Observations
   { observations :: [Observation]
-  } deriving (Show)
+  } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
 data Imperial = Imperial {
   temp :: Integer,
@@ -192,11 +199,22 @@ eitherObsersation1 = eitherDecode exampleObservation1 :: Either String [Observat
 --       return $ HashMap.unions objlst)
 --     Nothing -> return HashMap.empty
 
+pascalCaseParser :: Value -> Parser Person
+pascalCaseParser = withObject "Person" $ \obj -> do
+  firstName <- obj .: "FirstName"
+  lastName <- obj .: "LastName"
+  pure (Person { firstName = firstName, lastName = lastName })
 
-getSeriesRequest :: Int -> Request NoReqBody GetSeriesResponse GET
-getSeriesRequest seriesId =
-  Request NoReqBody GET [] $ https "api.thetvdb.com" /: "series" /: fromString
-    (show seriesId)
+pascalCasePerson :: Value
+pascalCasePerson = object
+  [ "FirstName" .= ("Dimitri" :: String)
+  , "LastName" .= ("Blaiddyd" :: String)
+  ]
+
+-- getSeriesRequest :: Int -> Request NoReqBody GetSeriesResponse GET
+-- getSeriesRequest seriesId =
+--   Request NoReqBody GET [] $ https "api.thetvdb.com" /: "series" /: fromString
+--     (show seriesId)
 
 -- getEpisodesRequest :: Int -> Int -> Request NoReqBody Category GET
 -- getEpisodesRequest seriesId page =
@@ -207,6 +225,7 @@ getSeriesRequest seriesId =
 --     /: "episodes"
 
 -- getMoves IO Value :: IO Value
+getMoves :: Monad m => Maybe a -> m a
 getMoves mv = do
   -- mv <- decode <$> B.readFile "moves.json"
   case mv of
@@ -317,20 +336,23 @@ exampleGetNew = runReq defaultHttpConfig $ do
 --     v <- req GET (https "hacker-news.firebaseio.com" /: "v0" /: "item" /: id') NoReqBody jsonResponse mempty
 --     return $ responseBody v
 
-fetchEntries :: IO Observations
-fetchEntries =
-  runReq defaultHttpConfig $ do
-    r <-
-      req
-        GET
-        (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current")
-        NoReqBody
-        jsonResponse $
-        "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
-        "units" =: ("e" :: String) <>
-        "stationId" =: ("KMNCOONR65" :: String) <>
-        "format" =: ("json" :: String)
-    pure $ observations (responseBody r :: Observations)
+-- fetchEntries :: IO Observations
+-- fetchEntries =
+--   runReq defaultHttpConfig $ do
+--     r <-
+--       req
+--         GET
+--         (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current")
+--         NoReqBody
+--         jsonResponse $
+--         "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+--         "units" =: ("e" :: String) <>
+--         "stationId" =: ("KMNCOONR65" :: String) <>
+--         "format" =: ("json" :: String)
+--     pure $ observations (responseBody r :: Observations)
+
+fromJSONValue :: FromJSON a => Value -> Maybe a
+fromJSONValue = parseMaybe parseJSON
 
 main :: IO ()
 main = do
@@ -424,6 +446,19 @@ main = do
   print result
   let response = (responseBody  result)
   print response
+  -- let x = Data.Aeson.Types.fromJSON response :: Data.Aeson.Types.Result [Observation]
+  let x = Data.Aeson.Types.fromJSON response :: Data.Aeson.Types.Result Observations
+  print x
+
+  let z = fromJSONValue response :: Maybe Observations
+  print "test"
+  print (Just (z))
+  -- print Just (z)
+  -- case z of
+  --   Nothing   -> "test"
+  --   Just val  -> "There is a value, and it is "
+
+  -- p <- (pascalCaseParser  pascalCasePerson)
 
   -- let x = Observation (response)
   -- print (responseBody  result)
