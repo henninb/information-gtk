@@ -32,6 +32,7 @@ import qualified Data.ByteString.Lazy as B
 import Text.JSON.Generic
 import qualified Data.Aeson.Schema as DAS
 import qualified Data.Text as T
+import qualified Network.HTTP.Client as HTTPClient
 -- import qualified Handlers.Logger            as L
 
 -- data Imperial = Imperial {
@@ -74,6 +75,10 @@ type MySchema = [DAS.schema|
 }
 |]
 
+newtype Observations = Observations
+  { observations :: [Observation]
+  } deriving (Show)
+
 data Imperial = Imperial {
   temp :: Integer,
   heatIndex :: Integer,
@@ -110,6 +115,8 @@ data Status = Status { ok :: Bool }
 
 instance FromJSON Status
 
+
+-- newtype HackerNewsM a = HackerNewsM { run :: ReaderT Env (ExceptT Data.Aeson.Error IO) a }
 
 newtype GetSeriesResponse = GetSeriesResponse {
   seriesName :: String
@@ -243,6 +250,87 @@ exampleGet = runReq defaultHttpConfig $ do
   liftIO $ print (responseBody response :: Value)
   -- return $ ok (responseBody response :: Status)
 
+-- getMockResource = req
+--   GET
+--   (http "www.mocky.io" /: "v2" /~ "5da208d92f00007900f418ff")
+--   NoReqBody
+--   bsResponse
+--   mempty
+
+
+getWeather :: IO (JsonResponse Value)
+getWeather =
+  runReq defaultHttpConfig $
+  req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
+  "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+  "units" =: ("e" :: String) <>
+  "stationId" =: ("KMNCOONR65" :: String) <>
+  "format" =: ("json" :: String)
+
+getWeather1 :: IO (JsonResponse [Observation])
+getWeather1 =
+  runReq defaultHttpConfig $
+  req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
+  "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+  "units" =: ("e" :: String) <>
+  "stationId" =: ("KMNCOONR65" :: String) <>
+  "format" =: ("json" :: String)
+
+-- serieses :: (MonadHttp m, Traversable f) => T.Text -> f T.Text -> m (f Series)
+-- serieses token = mapM (series token)
+
+-- series :: (MonadHttp m) => m Series
+-- series = runReq defaultHttpConfig $ do
+--     resp <- req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
+--          "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+--          "units" =: ("e" :: String) <>
+--          "stationId" =: ("KMNCOONR65" :: String) <>
+--          "format" =: ("json" :: String)
+--     -- resp <- req GET uri body jsonResponse auth
+--    return $ responseBody resp
+
+exampleGetNew :: (MonadHttp m) => m String
+exampleGetNew = runReq defaultHttpConfig $ do
+  response <-
+    req
+      GET
+      (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current")
+      NoReqBody
+      jsonResponse $
+      "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+      "units" =: ("e" :: String) <>
+      "stationId" =: ("KMNCOONR65" :: String) <>
+      "format" =: ("json" :: String)
+  return $ responseBody response
+
+-- getWeather1 :: IO (JsonResponse [Observation])
+-- getWeather1 =
+--   runReq defaultHttpConfig $
+--   req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
+--   "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+--   "units" =: ("e" :: String) <>
+--   "stationId" =: ("KMNCOONR65" :: String) <>
+--   "format" =: ("json" :: String)
+-- readStory :: StoryId -> HackerNewsM (Maybe Story)
+-- readStory id_ = flip catchError (\_ -> return Nothing) $ Just <$> do
+--     let id' = pack $ show id_ <> ".json"
+--     v <- req GET (https "hacker-news.firebaseio.com" /: "v0" /: "item" /: id') NoReqBody jsonResponse mempty
+--     return $ responseBody v
+
+fetchEntries :: IO Observations
+fetchEntries =
+  runReq defaultHttpConfig $ do
+    r <-
+      req
+        GET
+        (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current")
+        NoReqBody
+        jsonResponse $
+        "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+        "units" =: ("e" :: String) <>
+        "stationId" =: ("KMNCOONR65" :: String) <>
+        "format" =: ("json" :: String)
+    pure $ observations (responseBody r :: Observations)
 
 main :: IO ()
 main = do
@@ -331,6 +419,15 @@ main = do
     -- print all the users' ids
   -- print [DAS.get| obj.users[].id |]
   print [DAS.get| obj.observations[].stationID |]
+  -- liftIO (getWeather1)
+  result <- getWeather
+  print result
+  let response = (responseBody  result)
+  print response
+
+  -- let x = Observation (response)
+  -- print (responseBody  result)
+  -- liftIO $ print (result)
   -- let Right unwrappedObservation = eitherObsersation
   -- print unwrappedObservation
   -- debug $ "Keycloak returned perms: " ++ (show unwrappedObservation)

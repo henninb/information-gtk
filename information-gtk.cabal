@@ -36,6 +36,7 @@ library
     , gi-gtk-hs
     , hashmap
     , haskell-gi-base
+    , http-client
     , json
     , lens-aeson
     , mtl
@@ -70,6 +71,7 @@ executable information-gtk
     , gi-gtk-hs
     , hashmap
     , haskell-gi-base
+    , http-client
     , information-gtk
     , json
     , lens-aeson
@@ -105,6 +107,7 @@ test-suite information-gtk-test
     , gi-gtk-hs
     , hashmap
     , haskell-gi-base
+    , http-client
     , information-gtk
     , json
     , lens-aeson

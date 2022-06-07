@@ -42,6 +42,7 @@ dependencies:
 - bytestring
 - json
 - aeson-schemas
+- http-client
 # - aeson-schemas >= 0.4
 # - rio
 
