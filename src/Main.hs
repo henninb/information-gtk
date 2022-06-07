@@ -277,6 +277,10 @@ exampleGet = runReq defaultHttpConfig $ do
 --   mempty
 
 
+fromJust (Just x) = x
+fromJust Nothing = error "Maybe.fromJust: Nothing"
+
+
 getWeather :: IO (JsonResponse Value)
 getWeather =
   runReq defaultHttpConfig $
@@ -434,25 +438,22 @@ main = do
   -- print $ imperial record
   -- let myImperial = imperial record
   -- print $ temp $ imperial record
-  putStrLn $ "load configs"
+  -- putStrLn $ "load configs"
   obj <- either fail return =<<
     eitherDecodeFileStrict "example.json" :: IO (DAS.Object MySchema)
-
-    -- print all the users' ids
-  -- print [DAS.get| obj.users[].id |]
   print [DAS.get| obj.observations[].stationID |]
-  -- liftIO (getWeather1)
   result <- getWeather
-  print result
   let response = (responseBody  result)
-  print response
+  -- print response
   -- let x = Data.Aeson.Types.fromJSON response :: Data.Aeson.Types.Result [Observation]
-  let x = Data.Aeson.Types.fromJSON response :: Data.Aeson.Types.Result Observations
-  print x
+  -- let x = Data.Aeson.Types.fromJSON response :: Data.Aeson.Types.Result Observations
 
   let z = fromJSONValue response :: Maybe Observations
-  print "test"
-  print (Just (z))
+  let zz = (fromJust (z))
+  let zzz = (observations zz)
+  let zzzz = (head zzz)
+  let zzzzz = (imperial zzzz)
+  print (zzzzz)
   -- print Just (z)
   -- case z of
   --   Nothing   -> "test"
