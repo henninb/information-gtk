@@ -20,32 +20,16 @@ import Data.Aeson
 import Data.Aeson.Types
 import GHC.Generics
 import Data.String ( fromString )
--- import Network.Wai
--- import Network.Wai.Handler.Warp
--- import Servant
 import System.IO
 import Network.HTTP.Req as Req
 import Control.Monad.IO.Class
--- import Requests
 import Data.HashMap
--- import qualified RIO.ByteString   as B
 import qualified Data.ByteString.Lazy as B
 import Text.JSON.Generic
 import qualified Data.Aeson.Schema as DAS
 import qualified Data.Text as T
 import qualified Network.HTTP.Client as HTTPClient
--- import qualified Handlers.Logger            as L
 
--- data Imperial = Imperial {
---   temp :: Integer
--- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
-
--- First, define the schema of the JSON data
-
-data Person = Person
-  { firstName :: String
-  , lastName  :: String
-  } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
 type MySchema = [DAS.schema|
  {
@@ -103,11 +87,11 @@ data Observation  = Observation {
   stationID :: String,
   obsTimeUtc :: String,
   neighborhood :: String,
-  -- softwareType :: String,
+  softwareType :: Maybe String,
   country:: String,
   solarRadiation :: Double,
   lon :: Double,
-  -- realtimeFrequency :: String,
+  realtimeFrequency :: Maybe String,
   epoch :: Integer,
   lat :: Double,
   uv :: Integer,
@@ -117,169 +101,8 @@ data Observation  = Observation {
   imperial :: Imperial
 } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
-data Status = Status { ok :: Bool }
-    deriving (Generic)
-
-instance FromJSON Status
-
-
--- newtype HackerNewsM a = HackerNewsM { run :: ReaderT Env (ExceptT Data.Aeson.Error IO) a }
-
-newtype GetSeriesResponse = GetSeriesResponse {
-  seriesName :: String
-} deriving (Show)
-
-instance FromJSON GetSeriesResponse where
-  parseJSON = withObject
-    ""
-    (\o -> GetSeriesResponse <$> (o .: "data" >>= flip (.:) "seriesName"))
-
-
-exampleObservation = "{\"observations\":[{\"stationID\":\"KMNCOONR65\",\"obsTimeUtc\":\"2022-06-05T20:18:00Z\",\"obsTimeLocal\":\"2022-06-05 15:18:00\",\"neighborhood\":\"Thompson Heights\",\"softwareType\":null,\"country\":\"US\",\"solarRadiation\":57.3,\"lon\":-93.306,\"realtimeFrequency\":null,\"epoch\":1654460280,\"lat\":45.193,\"uv\":0.0,\"winddir\":187,\"humidity\":53,\"qcStatus\":1,\"imperial\":{\"temp\":71,\"heatIndex\":70,\"dewpt\":53,\"windChill\":71,\"windSpeed\":3,\"windGust\":3,\"pressure\":29.76,\"precipRate\":0.00,\"precipTotal\":0.00,\"elev\":863}}]}"
-
-jsonFile :: FilePath
-jsonFile = "example.json"
-
-getJSON :: IO B.ByteString
-getJSON = B.readFile jsonFile
-
-exampleObservation1 = "[{\"stationID\":\"KMNCOONR65\",\"obsTimeUtc\":\"2022-06-05T20:18:00Z\",\"obsTimeLocal\":\"2022-06-05 15:18:00\",\"neighborhood\":\"Thompson Heights\",\"softwareType\":null,\"country\":\"US\",\"solarRadiation\":57.3,\"lon\":-93.306,\"realtimeFrequency\":null,\"epoch\":1654460280,\"lat\":45.193,\"uv\":0.0,\"winddir\":187,\"humidity\":53,\"qcStatus\":1,\"imperial\":{\"temp\":71,\"heatIndex\":70,\"dewpt\":53,\"windChill\":71,\"windSpeed\":3,\"windGust\":3,\"pressure\":29.76,\"precipRate\":0.00,\"precipTotal\":0.00,\"elev\":863}}]"
-eitherObsersation1 = eitherDecode exampleObservation1 :: Either String [Observation]
--- eitherObsersation1 = eitherDecode exampleObservation1 :: Either String Observations
-
--- loadApiConfigs :: IO Observation
--- loadApiConfigs = do
---     config <- (eitherDecode <$> getJSON) :: IO (Either String Observation)
---     print config
---     -- print "gothere"
---     -- liftIO (print config)
---     -- print "gothere"
---     case config of
---         Left _ -> empty
---         Right x -> return x
-
--- parse :: FromJSON a => ByteString -> Maybe [Either Value a]
--- parse s = case decode s of
---   Nothing -> fail "could not decode as array"
---   Just values -> map tryDecode values
--- where
---   tryDecode :: FromJSON a =>Value -> Either Value a
---   tryDecode v = case decode (encode v) of
---     Nothing -> Left v
---     Just a -> Right a
-
--- parseResponse :: (FromJSON response, MonadThrow m, Show response) => L.Handle m -> B.ByteString -> m response
--- parseResponse hLogger respBody = case eitherDecode respBody of
---     Right result -> do
---         L.debug hLogger (show result)
---         return result
---     Left e     -> do
---         L.error hLogger $ ("Parsing failed due to mismatching type, error:\n\t" <> fromString e <> "\n") <> BC.unpack respBody
---         throwM $ RParseException . WrongType . fromString $ e
-
--- test =
---   case eitherDecode exampleObservation of
---     Right ret -> do
---       debug $ "Observation returned perms: " ++ (show ret)
---       return ret
---     Left (err2 :: String) -> do
---       debug $ "Keycloak parse error: " ++ (show err2)
---       throwError $ ParseError $ pack (show err2)
-
--- test :: Either String Category
--- test = eitherDecode exampleJson
-
--- getExtra :: Object -> Parser Object
--- getExtra v = do
---   mextra <- v .:? "extra"
---   case mextra of
---     Just vv -> vv & withArray "Abc.extra" (\arr -> do
---       let vallst = toList arr
---       objlst <- traverse (withObject "Abc.extra[..]" pure) vallst
---       return $ HashMap.unions objlst)
---     Nothing -> return HashMap.empty
-
-pascalCaseParser :: Value -> Parser Person
-pascalCaseParser = withObject "Person" $ \obj -> do
-  firstName <- obj .: "FirstName"
-  lastName <- obj .: "LastName"
-  pure (Person { firstName = firstName, lastName = lastName })
-
-pascalCasePerson :: Value
-pascalCasePerson = object
-  [ "FirstName" .= ("Dimitri" :: String)
-  , "LastName" .= ("Blaiddyd" :: String)
-  ]
-
--- getSeriesRequest :: Int -> Request NoReqBody GetSeriesResponse GET
--- getSeriesRequest seriesId =
---   Request NoReqBody GET [] $ https "api.thetvdb.com" /: "series" /: fromString
---     (show seriesId)
-
--- getEpisodesRequest :: Int -> Int -> Request NoReqBody Category GET
--- getEpisodesRequest seriesId page =
---   Request NoReqBody GET [("page", show page)]
---     $  https "api.thetvdb.com"
---     /: "series"
---     /: fromString (show seriesId)
---     /: "episodes"
-
--- getMoves IO Value :: IO Value
-getMoves :: Monad m => Maybe a -> m a
-getMoves mv = do
-  -- mv <- decode <$> B.readFile "moves.json"
-  case mv of
-    Nothing -> error "invalid JSON"
-    Just v -> return v
-
-examplePost :: IO ()
--- You can either make your monad an instance of 'MonadHttp', or use
--- 'runReq' in any IO-enabled monad without defining new instances.
-examplePost = runReq defaultHttpConfig $ do
-  let payload =
-        object
-          [ "foo" .= (10 :: Int),
-            "bar" .= (20 :: Int)
-          ]
-  -- One function—full power and flexibility, automatic retrying on timeouts
-  -- and such, automatic connection sharing.
-  response <-
-    req
-      POST -- method
-      (https "httpbin.org" /: "post") -- safe by construction URL
-      (ReqBodyJson payload) -- use built-in options or add your own
-      jsonResponse -- specify how to interpret response
-      mempty -- query params, headers, explicit port number, etc.
-      -- return $ ok (responseBody res :: Status)
-  liftIO $ print (responseBody response :: Value)
-
-
-exampleGet :: IO ()
-exampleGet = runReq defaultHttpConfig $ do
-  response <-
-    req
-      GET -- method
-      (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current")
-      NoReqBody
-      jsonResponse $
-      "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
-      "units" =: ("e" :: String) <>
-      "stationId" =: ("KMNCOONR65" :: String) <>
-      "format" =: ("json" :: String)
-  liftIO $ print (responseBody response :: Value)
-  -- return $ ok (responseBody response :: Status)
-
--- getMockResource = req
---   GET
---   (http "www.mocky.io" /: "v2" /~ "5da208d92f00007900f418ff")
---   NoReqBody
---   bsResponse
---   mempty
-
-
 fromJust (Just x) = x
 fromJust Nothing = error "Maybe.fromJust: Nothing"
-
 
 getWeather :: IO (JsonResponse Value)
 getWeather =
@@ -290,73 +113,20 @@ getWeather =
   "stationId" =: ("KMNCOONR65" :: String) <>
   "format" =: ("json" :: String)
 
-getWeather1 :: IO (JsonResponse [Observation])
-getWeather1 =
-  runReq defaultHttpConfig $
-  req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
-  "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
-  "units" =: ("e" :: String) <>
-  "stationId" =: ("KMNCOONR65" :: String) <>
-  "format" =: ("json" :: String)
-
--- serieses :: (MonadHttp m, Traversable f) => T.Text -> f T.Text -> m (f Series)
--- serieses token = mapM (series token)
-
--- series :: (MonadHttp m) => m Series
--- series = runReq defaultHttpConfig $ do
---     resp <- req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
---          "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
---          "units" =: ("e" :: String) <>
---          "stationId" =: ("KMNCOONR65" :: String) <>
---          "format" =: ("json" :: String)
---     -- resp <- req GET uri body jsonResponse auth
---    return $ responseBody resp
-
-exampleGetNew :: (MonadHttp m) => m String
-exampleGetNew = runReq defaultHttpConfig $ do
-  response <-
-    req
-      GET
-      (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current")
-      NoReqBody
-      jsonResponse $
-      "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
-      "units" =: ("e" :: String) <>
-      "stationId" =: ("KMNCOONR65" :: String) <>
-      "format" =: ("json" :: String)
-  return $ responseBody response
-
--- getWeather1 :: IO (JsonResponse [Observation])
--- getWeather1 =
---   runReq defaultHttpConfig $
---   req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
---   "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
---   "units" =: ("e" :: String) <>
---   "stationId" =: ("KMNCOONR65" :: String) <>
---   "format" =: ("json" :: String)
--- readStory :: StoryId -> HackerNewsM (Maybe Story)
--- readStory id_ = flip catchError (\_ -> return Nothing) $ Just <$> do
---     let id' = pack $ show id_ <> ".json"
---     v <- req GET (https "hacker-news.firebaseio.com" /: "v0" /: "item" /: id') NoReqBody jsonResponse mempty
---     return $ responseBody v
-
--- fetchEntries :: IO Observations
--- fetchEntries =
---   runReq defaultHttpConfig $ do
---     r <-
---       req
---         GET
---         (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current")
---         NoReqBody
---         jsonResponse $
---         "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
---         "units" =: ("e" :: String) <>
---         "stationId" =: ("KMNCOONR65" :: String) <>
---         "format" =: ("json" :: String)
---     pure $ observations (responseBody r :: Observations)
-
 fromJSONValue :: FromJSON a => Value -> Maybe a
 fromJSONValue = parseMaybe parseJSON
+
+getObservation :: IO ()
+getObservation = do
+  payload <- getWeather
+  let response = (responseBody  payload)
+
+  let justObservations = fromJSONValue response :: Maybe Observations
+  let observationList = (fromJust (justObservations))
+  let list = (observations observationList)
+  let observation = (head list)
+  let imperialData = (imperial observation)
+  print (imperialData)
 
 main :: IO ()
 main = do
@@ -396,11 +166,7 @@ main = do
   Gtk.buttonSetImage btn2 $ Just img2
   Gtk.widgetSetHexpand btn2 False
   on btn2 #clicked $ do
-    putStrLn "post"
-    examplePost
-    putStrLn "get"
-    exampleGet
-    -- Gtk.mainQuit
+    getObservation
 
   on win #keyPressEvent $ \keyEvent -> do
     key <- keyEvent `get` #keyval >>= GDK.keyvalToUnicode
@@ -414,11 +180,6 @@ main = do
   Gtk.gridSetRowSpacing grid 10
   Gtk.gridSetColumnHomogeneous grid True
 
-  -- #keyPressEvent \(EventKey k) -> True <$ do
-  --   kv <- foo $ managedForeignPtr k
-  --   putStrLn $ "key pressed: 0x" ++ showHex kv ""
-  --   bool (return ()) G.mainQuit $ kv == 0x71
-
   #attach grid btn1   0 0 1 1
   #attach grid label1 0 1 1 1
   #attach grid btn2   1 0 1 1
@@ -428,47 +189,9 @@ main = do
 
   Gtk.onWidgetDestroy win Gtk.mainQuit
   #showAll win
-  -- let Right unwrappedCategory = eitherCategory
-  -- print unwrappedCategory
 
-  let Right unwrappedObservation1 = eitherObsersation1
-  print $ unwrappedObservation1
-  -- print (length unwrappedObservation1)
-  -- let record = (head unwrappedObservation1)
-  -- print $ imperial record
-  -- let myImperial = imperial record
-  -- print $ temp $ imperial record
-  -- putStrLn $ "load configs"
-  obj <- either fail return =<<
-    eitherDecodeFileStrict "example.json" :: IO (DAS.Object MySchema)
-  print [DAS.get| obj.observations[].stationID |]
-  result <- getWeather
-  let response = (responseBody  result)
-  -- print response
-  -- let x = Data.Aeson.Types.fromJSON response :: Data.Aeson.Types.Result [Observation]
-  -- let x = Data.Aeson.Types.fromJSON response :: Data.Aeson.Types.Result Observations
-
-  let z = fromJSONValue response :: Maybe Observations
-  let zz = (fromJust (z))
-  let zzz = (observations zz)
-  let zzzz = (head zzz)
-  let zzzzz = (imperial zzzz)
-  print (zzzzz)
-  -- print Just (z)
-  -- case z of
-  --   Nothing   -> "test"
-  --   Just val  -> "There is a value, and it is "
-
-  -- p <- (pascalCaseParser  pascalCasePerson)
-
-  -- let x = Observation (response)
-  -- print (responseBody  result)
-  -- liftIO $ print (result)
-  -- let Right unwrappedObservation = eitherObsersation
-  -- print unwrappedObservation
-  -- debug $ "Keycloak returned perms: " ++ (show unwrappedObservation)
-  -- x <- decode exampleObservation :: Maybe Observation
-  -- print x
-  -- liftIO (getSeriesRequest)
+  -- obj <- either fail return =<<
+  --   eitherDecodeFileStrict "example.json" :: IO (DAS.Object MySchema)
+  -- print [DAS.get| obj.observations[].stationID |]
 
   Gtk.main
