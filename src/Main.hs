@@ -116,7 +116,7 @@ getWeather =
 fromJSONValue :: FromJSON a => Value -> Maybe a
 fromJSONValue = parseMaybe parseJSON
 
-getObservation :: IO ()
+getObservation :: IO Observation
 getObservation = do
   payload <- getWeather
   let response = (responseBody  payload)
@@ -127,6 +127,7 @@ getObservation = do
   let observation = (head list)
   let imperialData = (imperial observation)
   print (imperialData)
+  return observation
 
 main :: IO ()
 main = do
@@ -151,7 +152,7 @@ main = do
   Gtk.labelSetMarkup label1 "<b>Cancel</b>"
 
   label2 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label2 "<b>Weather</b>"
+  Gtk.labelSetMarkup label2 ("<b>Weather" <> "</b>")
 
   btn1 <- Gtk.buttonNew
   Gtk.buttonSetRelief btn1 Gtk.ReliefStyleNone
@@ -166,7 +167,8 @@ main = do
   Gtk.buttonSetImage btn2 $ Just img2
   Gtk.widgetSetHexpand btn2 False
   on btn2 #clicked $ do
-    getObservation
+    -- getObservation
+    print "test"
 
   on win #keyPressEvent $ \keyEvent -> do
     key <- keyEvent `get` #keyval >>= GDK.keyvalToUnicode
@@ -193,5 +195,9 @@ main = do
   -- obj <- either fail return =<<
   --   eitherDecodeFileStrict "example.json" :: IO (DAS.Object MySchema)
   -- print [DAS.get| obj.observations[].stationID |]
-
+  observation <- getObservation
+  let imperialData = (imperial observation)
+  print observation
+  let temperature = (temp imperialData)
+  Gtk.labelSetMarkup label2 ("<b>" <> T.pack (show temperature) <> " fahrenheit</b>")
   Gtk.main
