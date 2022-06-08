@@ -6,11 +6,6 @@
 
 module Requests where
 
--- import           App                            ( App
---                                                 , BridgeAppState(..)
---                                                 , DefaultBridgeApp
---                                                 )
-
 import           Control.Monad.Error.Class      ( liftEither )
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Except
@@ -19,10 +14,8 @@ import           Control.Monad.State.Class      ( get )
 import           Data.Aeson
 import           Data.Kind                      ( Constraint )
 import           Data.String
--- import           Err
 import           Network.HTTP.Req
 import qualified Data.Text                     as T
--- import           DbBackend
 
 data Request input output method =
   Request
