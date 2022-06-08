@@ -119,15 +119,20 @@ fromJSONValue = parseMaybe parseJSON
 getObservation :: IO Observation
 getObservation = do
   payload <- getWeather
-  let response = (responseBody  payload)
+  let response = (responseBody payload)
 
   let justObservations = fromJSONValue response :: Maybe Observations
   let observationList = (fromJust (justObservations))
   let list = (observations observationList)
   let observation = (head list)
   let imperialData = (imperial observation)
-  print (imperialData)
   return observation
+
+getObservationPayload :: IO B.ByteString
+getObservationPayload = do
+  payload <- getWeather
+  let response = (responseBody payload)
+  return (Data.Aeson.encode response)
 
 main :: IO ()
 main = do
@@ -192,12 +197,15 @@ main = do
   Gtk.onWidgetDestroy win Gtk.mainQuit
   #showAll win
 
+  obj <- getObservationPayload
+  -- eitherDecode obj :: IO (DAS.Object MySchema)
+  print obj
+
   -- obj <- either fail return =<<
   --   eitherDecodeFileStrict "example.json" :: IO (DAS.Object MySchema)
   -- print [DAS.get| obj.observations[].stationID |]
   observation <- getObservation
   let imperialData = (imperial observation)
-  print observation
   let temperature = (temp imperialData)
   Gtk.labelSetMarkup label2 ("<b>" <> T.pack (show temperature) <> " fahrenheit</b>")
   Gtk.main

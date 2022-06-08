@@ -7,3 +7,5 @@ https://github.com/evuez/ttyme/blob/321fba3807a0a635421128ebf4055705dc46301b/src
 
 
 https://williamyaoh.com/posts/2019-10-19-a-cheatsheet-to-json-handling.html
+
+https://mmhaskell.com/blog/2017/6/5/flexible-data-with-aeson
