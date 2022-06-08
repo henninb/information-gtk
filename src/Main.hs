@@ -143,7 +143,7 @@ main = do
 
   win <- Gtk.windowNew Gtk.WindowTypeToplevel
   Gtk.setContainerBorderWidth win 10
-  Gtk.setWindowTitle win "ByeBye"
+  Gtk.setWindowTitle win "Weather"
   Gtk.setWindowResizable win False
   Gtk.setWindowDefaultWidth win 750
   Gtk.setWindowDefaultHeight win 225
@@ -154,7 +154,7 @@ main = do
   img2 <- Gtk.imageNewFromFile $ home ++ "/.local/img/logout.png"
 
   label1 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label1 "<b>Cancel</b>"
+  Gtk.labelSetMarkup label1 "<b>Done</b>"
 
   label2 <- Gtk.labelNew Nothing
   Gtk.labelSetMarkup label2 ("<b>Weather" <> "</b>")
@@ -164,7 +164,7 @@ main = do
   Gtk.buttonSetImage btn1 $ Just img1
   Gtk.widgetSetHexpand btn1 False
   on btn1 #clicked $ do
-    putStrLn "User choose: Cancel"
+    putStrLn "User chose: Done"
     Gtk.widgetDestroy win
 
   btn2 <- Gtk.buttonNew
@@ -172,7 +172,6 @@ main = do
   Gtk.buttonSetImage btn2 $ Just img2
   Gtk.widgetSetHexpand btn2 False
   on btn2 #clicked $ do
-    -- getObservation
     print "test"
 
   on win #keyPressEvent $ \keyEvent -> do
@@ -198,7 +197,7 @@ main = do
   #showAll win
 
   obj <- getObservationPayload
-  -- eitherDecode obj :: IO (DAS.Object MySchema)
+  -- let x = eitherDecodeStrict obj :: IO (DAS.Object MySchema)
   print obj
 
   -- obj <- either fail return =<<
