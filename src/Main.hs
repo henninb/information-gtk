@@ -12,26 +12,32 @@ module Main where
 import Data.GI.Base
 import qualified GI.Gtk as Gtk
 import qualified GI.Gdk as GDK
-import System.Directory
-import System.Posix.User
-import System.Process
+import System.Directory (getHomeDirectory)
+import System.Posix.User (getEffectiveUserName)
 import Data.Char (chr)
-import Data.Aeson
-import Data.Aeson.Types
-import GHC.Generics
+import Data.Aeson (eitherDecode, encode, eitherDecodeStrict)
+import Data.Aeson.Types (ToJSON, FromJSON, Value, parseJSON, parseMaybe)
+import GHC.Generics (Generic)
 import Data.String ( fromString )
-import System.IO
 import Network.HTTP.Req as Req
-import Control.Monad.IO.Class
-import Data.HashMap
-import qualified Data.ByteString.Lazy as B
-import Text.JSON.Generic
-import qualified Data.Aeson.Schema as DAS
-import qualified Data.Text as T
-import qualified Network.HTTP.Client as HTTPClient
+-- import Control.Monad.IO.Class
+-- import Data.HashMap
+
+-- import Data.Text.Lazy             as TL
+-- import Data.Text.Lazy.Encoding    as TL
+-- import qualified Data.ByteString as B
+-- import qualified Data.ByteString as B
+import qualified Data.ByteString.Lazy as BL
+-- import qualified Data.Text as T
+import Data.Text (pack)
+-- import Data.Text.Encoding
+import Text.JSON.Generic (Typeable)
+-- import qualified Data.Aeson.Schema as DAS
+import Data.Aeson.Schema (schema, Object, get)
+-- import qualified Network.HTTP.Client as HTTPClient
 
 
-type MySchema = [DAS.schema|
+type MySchema = [schema|
  {
   observations: List
     {
@@ -43,7 +49,7 @@ type MySchema = [DAS.schema|
       country: Text,
       solarRadiation: Float,
       lon: Float,
-      realtimeFrequency: Maybe Int,
+      realtimeFrequency: Maybe Float,
       epoch: Int,
       lat: Float,
       uv: Int,
@@ -128,11 +134,35 @@ getObservation = do
   let imperialData = (imperial observation)
   return observation
 
-getObservationPayload :: IO B.ByteString
+getObservationPayload :: IO BL.ByteString
 getObservationPayload = do
   payload <- getWeather
   let response = (responseBody payload)
   return (Data.Aeson.encode response)
+
+-- encode :: T.Text -> BL.ByteString
+-- encode = T.encodeUtf8 . TL.toStrict
+
+-- decode :: B.ByteString -> T.Text
+-- decode = TL.fromStrict . T.decodeUtf8
+
+-- showOp = putStrLn . unlines . map show
+--
+-- decode'' :: FromJSON a => B.Text -> Maybe a
+-- decode'' = decode . toLazyByteString . encodeUtf8Builder
+
+-- decodeFiles :: B.ByteString -> Either String Object
+-- decodeFiles = eitherDecodeStrict
+
+testme = do
+  payload <- getObservationPayload -- (BL.ByteString)
+  output <- either fail return $ eitherDecode payload :: IO (Object MySchema)
+  print payload
+  print "-----"
+  print output
+  print [Data.Aeson.Schema.get| output.observations[].stationID |]
+  return ([Data.Aeson.Schema.get| output.observations[].imperial.temp |])
+  -- print Right (zz)
 
 main :: IO ()
 main = do
@@ -175,7 +205,7 @@ main = do
     print "test"
 
   on win #keyPressEvent $ \keyEvent -> do
-    key <- keyEvent `get` #keyval >>= GDK.keyvalToUnicode
+    key <- keyEvent `Data.GI.Base.get` #keyval >>= GDK.keyvalToUnicode
     -- putStrLn $ "Key pressed: ‘" ++ (chr (fromIntegral key) : []) ++ "’ (" ++ show key ++ ")"
     putStrLn $ "Key pressed: (" ++ show key ++ ")"
     if key == 27 then Gtk.mainQuit else pure ()
@@ -200,11 +230,13 @@ main = do
   -- let x = eitherDecodeStrict obj :: IO (DAS.Object MySchema)
   print obj
 
+  -- o <- either fail return $ eitherDecode "{ \"foo\": { \"bar\": 1 } }" :: IO (DAS.Object MySchema)
+
   -- obj <- either fail return =<<
   --   eitherDecodeFileStrict "example.json" :: IO (DAS.Object MySchema)
   -- print [DAS.get| obj.observations[].stationID |]
   observation <- getObservation
   let imperialData = (imperial observation)
   let temperature = (temp imperialData)
-  Gtk.labelSetMarkup label2 ("<b>" <> T.pack (show temperature) <> " fahrenheit</b>")
+  Gtk.labelSetMarkup label2 ("<b>" <> pack (show temperature) <> " fahrenheit</b>")
   Gtk.main

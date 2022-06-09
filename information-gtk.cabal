@@ -40,6 +40,7 @@ library
     , json
     , lens-aeson
     , mtl
+    , pretty-simple
     , process
     , req
     , servant
@@ -47,8 +48,6 @@ library
     , text
     , transformers
     , unix
-    , wai
-    , warp
   default-language: Haskell2010
 
 executable information-gtk
@@ -76,6 +75,7 @@ executable information-gtk
     , json
     , lens-aeson
     , mtl
+    , pretty-simple
     , process
     , req
     , servant
@@ -83,8 +83,6 @@ executable information-gtk
     , text
     , transformers
     , unix
-    , wai
-    , warp
   default-language: Haskell2010
 
 test-suite information-gtk-test
@@ -112,6 +110,7 @@ test-suite information-gtk-test
     , json
     , lens-aeson
     , mtl
+    , pretty-simple
     , process
     , req
     , servant
@@ -119,6 +118,4 @@ test-suite information-gtk-test
     , text
     , transformers
     , unix
-    , wai
-    , warp
   default-language: Haskell2010

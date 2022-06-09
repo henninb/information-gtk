@@ -32,8 +32,8 @@ dependencies:
 - aeson-casing
 - servant
 - servant-server
-- wai
-- warp
+# - wai
+# - warp
 - lens-aeson
 - req
 - mtl
@@ -43,6 +43,9 @@ dependencies:
 - json
 - aeson-schemas
 - http-client
+# - bytestring-encoding
+# - bytestring-encoding
+- pretty-simple
 # - aeson-schemas >= 0.4
 # - rio
 
