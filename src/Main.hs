@@ -19,7 +19,9 @@ import Data.Aeson (eitherDecode, encode, eitherDecodeStrict)
 import Data.Aeson.Types (ToJSON, FromJSON, Value, parseJSON, parseMaybe)
 import GHC.Generics (Generic)
 import Data.String ( fromString )
-import Network.HTTP.Req as Req
+-- import Network.HTTP.Req (JsonResponse, jsonResponse, responseBody, (/:), defaultHttpConfig, (=:), https, runReq, req, NoReqBody, GET)
+import Network.HTTP.Req
+-- import Prelude
 -- import Control.Monad.IO.Class
 -- import Data.HashMap
 
