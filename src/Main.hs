@@ -186,10 +186,41 @@ main = do
   img2 <- Gtk.imageNewFromFile $ home ++ "/.local/img/logout.png"
 
   label1 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label1 "<b>Done</b>"
+  Gtk.labelSetMarkup label1 ("<b>" <> "Done" <> "</b>")
 
   label2 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label2 ("<b>Weather" <> "</b>")
+  Gtk.labelSetMarkup label2 ("<b>" <> "Temperature: 70" <> "</b>")
+  -- Gtk.widgetOverrideFontSource label2
+  -- Gtk.lebelSetFont label2
+
+-- $title->modify_font(new PangoFontDescription("Times New Roman Italic 10"));
+
+  -- label3 <- Gtk.labelNew Nothing
+  -- Gtk.labelSetMarkup label3 ("<b>" <> "Humidity: 50" <> "</b>")
+
+  label4 <- Gtk.labelNew Nothing
+  Gtk.labelSetMarkup label4 ("<b>" <> "Pressure: 29.87" <> "</b>")
+
+  label5 <- Gtk.labelNew Nothing
+  Gtk.labelSetMarkup label5 ("<b>" <> "Wind Chill: 54" <> "</b>")
+
+  label6 <- Gtk.labelNew Nothing
+  Gtk.labelSetMarkup label6 ("<b>" <> "Wind Gust: 0" <> "</b>")
+
+  label7 <- Gtk.labelNew Nothing
+  Gtk.labelSetMarkup label7 ("<b>" <> "Wind Speed: 5" <> "</b>")
+
+  label8 <- Gtk.labelNew Nothing
+  Gtk.labelSetMarkup label8 ("<b>" <> "Heat Index: 5" <> "</b>")
+
+  label9 <- Gtk.labelNew Nothing
+  Gtk.labelSetMarkup label9 ("<b>" <> "Dew Point: 5" <> "</b>")
+
+  label10 <- Gtk.labelNew Nothing
+  Gtk.labelSetMarkup label10 ("<b>" <> "Precipitation Rate: 5" <> "</b>")
+
+  label11 <- Gtk.labelNew Nothing
+  Gtk.labelSetMarkup label11 ("<b>" <> "Precipitation Total: 5" <> "</b>")
 
   btn1 <- Gtk.buttonNew
   Gtk.buttonSetRelief btn1 Gtk.ReliefStyleNone
@@ -220,8 +251,17 @@ main = do
 
   #attach grid btn1   0 0 1 1
   #attach grid label1 0 1 1 1
-  #attach grid btn2   1 0 1 1
+  -- #attach grid btn2   1 0 1 1
   #attach grid label2 1 1 1 1
+  -- #attach grid label3 1 2 1 1
+  #attach grid label4 1 2 1 1
+  #attach grid label5 1 3 1 1
+  #attach grid label6 1 4 1 1
+  #attach grid label7 1 5 1 1
+  #attach grid label8 1 6 1 1
+  #attach grid label9 1 7 1 1
+  #attach grid label10 1 8 1 1
+  #attach grid label11 1 9 1 1
 
   #add win grid
 
@@ -239,6 +279,8 @@ main = do
   -- print [DAS.get| obj.observations[].stationID |]
   observation <- getObservation
   let imperialData = (imperial observation)
-  let temperature = (temp imperialData)
-  Gtk.labelSetMarkup label2 ("<b>" <> pack (show temperature) <> " fahrenheit</b>")
+  -- let temperature = (temp imperialData)
+  Gtk.labelSetMarkup label2 ("<b>" <> "Temperature: " <> pack (show (temp imperialData)) <> " F" <> "</b>")
+  Gtk.labelSetMarkup label4 ("<b>" <> "Humidity: " <> pack (show (pressure imperialData)) <> "" <> "</b>")
+  Gtk.labelSetMarkup label5 ("<b>" <> "Windchill: " <> pack (show (windChill imperialData)) <> "" <> "</b>")
   Gtk.main
