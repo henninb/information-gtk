@@ -4,24 +4,24 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           information-gtk
+name:           weather-gtk
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/byebye#readme>
-homepage:       https://github.com/githubuser/information-gtk#readme
-bug-reports:    https://github.com/githubuser/information-gtk/issues
+description:    Please see the README on GitHub
+homepage:       https://github.com/githubuser/weather-gtk#readme
+bug-reports:    https://github.com/githubuser/weather-gtk/issues
 license:        GPL-3
 build-type:     Simple
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/information-gtk
+  location: https://github.com/githubuser/weather-gtk
 
 library
   exposed-modules:
       Main
       Requests
   other-modules:
-      Paths_information_gtk
+      Paths_weather_gtk
   hs-source-dirs:
       src
   build-depends:
@@ -50,11 +50,11 @@ library
     , unix
   default-language: Haskell2010
 
-executable information-gtk
+executable weather-gtk
   main-is: Main.hs
   other-modules:
       Requests
-      Paths_information_gtk
+      Paths_weather_gtk
   hs-source-dirs:
       src
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -71,7 +71,6 @@ executable information-gtk
     , hashmap
     , haskell-gi-base
     , http-client
-    , information-gtk
     , json
     , lens-aeson
     , mtl
@@ -83,13 +82,14 @@ executable information-gtk
     , text
     , transformers
     , unix
+    , weather-gtk
   default-language: Haskell2010
 
-test-suite information-gtk-test
+test-suite weather-gtk-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_information_gtk
+      Paths_weather_gtk
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -106,7 +106,6 @@ test-suite information-gtk-test
     , hashmap
     , haskell-gi-base
     , http-client
-    , information-gtk
     , json
     , lens-aeson
     , mtl
@@ -118,4 +117,5 @@ test-suite information-gtk-test
     , text
     , transformers
     , unix
+    , weather-gtk
   default-language: Haskell2010

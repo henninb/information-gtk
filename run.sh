@@ -1,6 +1,5 @@
 #!/bin/sh
 
-mkdir -p src
 # stack run
 
 # stack build

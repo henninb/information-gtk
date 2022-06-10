@@ -281,6 +281,12 @@ main = do
   let imperialData = (imperial observation)
   -- let temperature = (temp imperialData)
   Gtk.labelSetMarkup label2 ("<b>" <> "Temperature: " <> pack (show (temp imperialData)) <> " F" <> "</b>")
-  Gtk.labelSetMarkup label4 ("<b>" <> "Humidity: " <> pack (show (pressure imperialData)) <> "" <> "</b>")
+  Gtk.labelSetMarkup label4 ("<b>" <> "Pressure: " <> pack (show (pressure imperialData)) <> "" <> "</b>")
   Gtk.labelSetMarkup label5 ("<b>" <> "Windchill: " <> pack (show (windChill imperialData)) <> "" <> "</b>")
+  Gtk.labelSetMarkup label6 ("<b>" <> "Wind Gust: " <> pack (show (windGust imperialData)) <> "" <> "</b>")
+  Gtk.labelSetMarkup label7 ("<b>" <> "Wind Speed: " <> pack (show (windSpeed imperialData)) <> "" <> "</b>")
+  Gtk.labelSetMarkup label8 ("<b>" <> "Heat Index: " <> pack (show (heatIndex imperialData)) <> "" <> "</b>")
+  Gtk.labelSetMarkup label9 ("<b>" <> "Dew Point: " <> pack (show (dewpt imperialData)) <> "" <> "</b>")
+  Gtk.labelSetMarkup label10 ("<b>" <> "Precipitation Rate: " <> pack (show (precipRate imperialData)) <> "" <> "</b>")
+  Gtk.labelSetMarkup label11 ("<b>" <> "Precipitation: " <> pack (show (precipTotal imperialData)) <> "" <> "</b>")
   Gtk.main
