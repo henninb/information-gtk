@@ -189,7 +189,6 @@ main = do
   Gtk.labelSetMarkup label1 ("<b>" <> "Done" <> "</b>")
 
   label2 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label2 ("<b>" <> "Temperature: 70" <> "</b>")
   -- Gtk.widgetOverrideFontSource label2
   -- Gtk.lebelSetFont label2
 
@@ -199,28 +198,13 @@ main = do
   -- Gtk.labelSetMarkup label3 ("<b>" <> "Humidity: 50" <> "</b>")
 
   label4 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label4 ("<b>" <> "Pressure: 29.87" <> "</b>")
-
   label5 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label5 ("<b>" <> "Wind Chill: 54" <> "</b>")
-
   label6 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label6 ("<b>" <> "Wind Gust: 0" <> "</b>")
-
   label7 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label7 ("<b>" <> "Wind Speed: 5" <> "</b>")
-
   label8 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label8 ("<b>" <> "Heat Index: 5" <> "</b>")
-
   label9 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label9 ("<b>" <> "Dew Point: 5" <> "</b>")
-
   label10 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label10 ("<b>" <> "Precipitation Rate: 5" <> "</b>")
-
   label11 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label11 ("<b>" <> "Precipitation Total: 5" <> "</b>")
 
   btn1 <- Gtk.buttonNew
   Gtk.buttonSetRelief btn1 Gtk.ReliefStyleNone
