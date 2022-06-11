@@ -38,6 +38,59 @@ import Text.JSON.Generic (Typeable)
 import Data.Aeson.Schema (schema, Object, get)
 -- import qualified Network.HTTP.Client as HTTPClient
 
+type WeatherSchema = [schema|
+  {
+    id: Text,
+    v3-wx-observations-current: {
+      cloudCeiling: Maybe Text,
+      cloudCoverPhrase: Text,
+      dayOfWeek: Text,
+      dayOrNight: Text,
+      expirationTimeUtc: Int,
+      iconCode: Int,
+      iconCodeExtend: Int,
+      obsQualifierCode: Text,
+      obsQualifierSeverity: Int,
+      precip1Hour: Float,
+      precip6Hour: Float,
+      precip24Hour: Float,
+      pressureAltimeter: Float,
+      pressureChange: Float,
+      pressureMeanSeaLevel: Float,
+      pressureTendencyCode: Int,
+      pressureTendencyTrend: Text,
+      relativeHumidity: Int,
+      snow1Hour: Int,
+      snow6Hour: Int,
+      snow24Hour: Int,
+      sunriseTimeLocal: Text,
+      sunriseTimeUtc: Int,
+      sunsetTimeLocal: Text,
+      sunsetTimeUtc: Int,
+      temperature: Int,
+      temperatureChange24Hour: Int,
+      temperatureDewPoint: Int,
+      temperatureFeelsLike: Int,
+      temperatureHeatIndex: Int,
+      temperatureMax24Hour: Int,
+      temperatureMaxSince7Am: Int,
+      temperatureMin24Hour: Int,
+      temperatureWindChill: Int,
+      uvDescription: Text,
+      uvIndex: Int,
+      validTimeLocal: Text,
+      validTimeUtc: Int,
+      visibility: Int,
+      windDirection: Int,
+      windDirectionCardinal: Text,
+      windGust: Maybe Int,
+      windSpeed: Int,
+      wxPhraseLong: Text,
+      wxPhraseMedium: Text,
+      wxPhraseShort: Text
+    }
+  }
+|]
 
 type MySchema = [schema|
  {
