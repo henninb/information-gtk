@@ -37,6 +37,7 @@ import Text.JSON.Generic (Typeable)
 -- import qualified Data.Aeson.Schema as DAS
 import Data.Aeson.Schema (schema, Object, get)
 -- import qualified Network.HTTP.Client as HTTPClient
+-- type TestSchema = [schema| #List | { id: Text }} |]
 
 type WeatherSchema = [schema|
   {
@@ -162,8 +163,73 @@ data Observation  = Observation {
   imperial :: Imperial
 } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
+data Weather = Weather {
+    id:: String,
+    -- v3-wx-observations-current:: ObservationV3
+     observation3:: ObservationV3
+} deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+
+data ObservationV3 = ObservationV3 {
+      cloudCeiling:: Maybe String,
+      cloudCoverPhrase:: String,
+      dayOfWeek:: String,
+      dayOrNight:: String,
+      expirationTimeUtc:: Integer,
+      iconCode:: Integer,
+      iconCodeExtend:: Integer,
+      obsQualifierCode:: String,
+      obsQualifierSeverity:: Int,
+      precip1Hour:: Float,
+      precip6Hour:: Float,
+      precip24Hour:: Float,
+      pressureAltimeter:: Float,
+      pressureChange:: Float,
+      pressureMeanSeaLevel:: Float,
+      pressureTendencyCode:: Int,
+      pressureTendencyTrend:: String,
+      relativeHumidity:: Int,
+      snow1Hour:: Int,
+      snow6Hour:: Int,
+      snow24Hour:: Int,
+      sunriseTimeLocal:: String,
+      sunriseTimeUtc:: Int,
+      sunsetTimeLocal:: String,
+      sunsetTimeUtc:: Int,
+      temperature:: Int,
+      temperatureChange24Hour:: Int,
+      temperatureDewPoint:: Int,
+      temperatureFeelsLike:: Int,
+      temperatureHeatIndex:: Int,
+      temperatureMax24Hour:: Int,
+      temperatureMaxSince7Am:: Int,
+      temperatureMin24Hour:: Int,
+      temperatureWindChill:: Int,
+      uvDescription:: String,
+      uvIndex:: Int,
+      validTimeLocal:: String,
+      validTimeUtc:: Int,
+      visibility:: Int,
+      windDirection:: Int,
+      windDirectionCardinal:: String,
+      -- windGust:: Maybe Int,
+      -- windSpeed:: Int,
+      wxPhraseLong:: String,
+      wxPhraseMedium:: String,
+      wxPhraseShort:: String
+} deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+
 fromJust (Just x) = x
 fromJust Nothing = error "Maybe.fromJust: Nothing"
+
+weatherApi :: IO (JsonResponse Value)
+weatherApi =
+  runReq defaultHttpConfig $
+  req GET (https "api.weather.com" /: "v3" /: "aggcommon" /: "v3-wx-observations-current") NoReqBody jsonResponse $
+  "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+  "geocodes" =: ("45.18,-93.32" :: String) <>
+  "units" =: ("e" :: String) <>
+  "language" =: ("en-US" :: String) <>
+  "format" =: ("json" :: String)
 
 getWeather :: IO (JsonResponse Value)
 getWeather =
@@ -195,19 +261,11 @@ getObservationPayload = do
   let response = (responseBody payload)
   return (Data.Aeson.encode response)
 
--- encode :: T.Text -> BL.ByteString
--- encode = T.encodeUtf8 . TL.toStrict
-
--- decode :: B.ByteString -> T.Text
--- decode = TL.fromStrict . T.decodeUtf8
-
--- showOp = putStrLn . unlines . map show
---
--- decode'' :: FromJSON a => B.Text -> Maybe a
--- decode'' = decode . toLazyByteString . encodeUtf8Builder
-
--- decodeFiles :: B.ByteString -> Either String Object
--- decodeFiles = eitherDecodeStrict
+getWeatherApiPayload :: IO BL.ByteString
+getWeatherApiPayload = do
+  payload <- weatherApi
+  let response = (responseBody payload)
+  return (Data.Aeson.encode response)
 
 testme = do
   payload <- getObservationPayload -- (BL.ByteString)
@@ -218,6 +276,15 @@ testme = do
   print [Data.Aeson.Schema.get| output.observations[].stationID |]
   return ([Data.Aeson.Schema.get| output.observations[].imperial.temp |])
   -- print Right (zz)
+
+testmeToo = do
+  payload <- getWeatherApiPayload -- (BL.ByteString)
+  output <- either fail return $ eitherDecode payload :: IO (Object WeatherSchema)
+  print payload
+  print "-----"
+  print output
+  -- print [Data.Aeson.Schema.get| output.observations[].stationID |]
+  -- return ([Data.Aeson.Schema.get| output.observations[].imperial.temp |])
 
 main :: IO ()
 main = do

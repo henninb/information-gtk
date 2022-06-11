@@ -19,7 +19,6 @@ source-repository head
 library
   exposed-modules:
       Main
-      MainNew
       Requests
   other-modules:
       Paths_weather_gtk
@@ -54,7 +53,6 @@ library
 executable weather-gtk
   main-is: Main.hs
   other-modules:
-      MainNew
       Requests
       Paths_weather_gtk
   hs-source-dirs:
