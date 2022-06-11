@@ -39,6 +39,60 @@ import Data.Aeson.Schema (schema, Object, get)
 -- import qualified Network.HTTP.Client as HTTPClient
 
 
+-- type WeatherSchema = [schema|
+--   {
+--     id: Text,
+--     v3-wx-observations-current: {
+--       cloudCeiling: Maybe Text
+--       cloudCoverPhrase: Text,
+--       dayOfWeek: Text,
+--       dayOrNight: Text,
+--       expirationTimeUtc: Int,
+--       iconCode: Int,
+--       iconCodeExtend: Int,
+--       obsQualifierCode: Text,
+--       obsQualifierSeverity: Int,
+--       precip1Hour: Float,
+--       precip6Hour: Float,
+--       precip24Hour: Float,
+--       pressureAltimeter: Float,
+--       pressureChange: Float,
+--       pressureMeanSeaLevel: Float,
+--       pressureTendencyCode: Int,
+--       pressureTendencyTrend: Text,
+--       relativeHumidity: Int,
+--       snow1Hour: Int,
+--       snow6Hour: Int,
+--       snow24Hour: Int,
+--       sunriseTimeLocal: Text,
+--       sunriseTimeUtc: Int,
+--       sunsetTimeLocal: Text,
+--       sunsetTimeUtc: Int,
+--       temperature: Int,
+--       temperatureChange24Hour: Int,
+--       temperatureDewPoint: Int,
+--       temperatureFeelsLike: Int,
+--       temperatureHeatIndex: Int,
+--       temperatureMax24Hour: Int,
+--       temperatureMaxSince7Am: Int,
+--       temperatureMin24Hour: Int,
+--       temperatureWindChill: Int,
+--       uvDescription: Text,
+--       uvIndex: Int,
+--       validTimeLocal: Text,
+--       validTimeUtc: Int,
+--       visibility: Int,
+--       windDirection: Int,
+--       windDirectionCardinal: Text,
+--       windGust: Maybe Int,
+--       windSpeed: Int,
+--       wxPhraseLong: Text,
+--       wxPhraseMedium: Text,
+--       wxPhraseShort: Text
+--     }
+--   }
+-- |]
+
 type MySchema = [schema|
  {
   observations: List
@@ -66,7 +120,7 @@ type MySchema = [schema|
         windSpeed: Int,
         windGust: Int,
         pressure: Float,
-        precipRate: Float,
+        precipRate: Int,
         precipTotal: Float,
         elev: Int
       }
@@ -86,8 +140,8 @@ data Imperial = Imperial {
   windSpeed :: Integer,
   windGust :: Integer,
   pressure :: Double,
-  precipRate :: Double,
-  precipTotal :: Double,
+  precipRate :: Integer,
+  precipTotal :: Integer,
   elev :: Integer
 } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
@@ -111,6 +165,17 @@ data Observation  = Observation {
 
 fromJust (Just x) = x
 fromJust Nothing = error "Maybe.fromJust: Nothing"
+
+-- weatherApi :: IO (JsonResponse Value)
+-- weatherApi =
+--   runReq defaultHttpConfig $
+--   -- req GET (https api.weather.com /: v3 /: aggcommon /: v3alertsHeadlines;v3-wx-observations-current;v3-location-point) NoReqBody jsonResponse $
+--   req GET (https api.weather.com /: v3 /: aggcommon /: v3-wx-observations-current) NoReqBody jsonResponse $
+--   apiKey =: (e1f10a1e78da46f5b10a1e78da96f525 :: String) <>
+--   geocodes =: (45.18,-93.32 :: String) <>
+--   language =: (en-US :: String) <>
+--   units =: (e :: String) <>
+--   format =: (json :: String)
 
 getWeather :: IO (JsonResponse Value)
 getWeather =
@@ -189,38 +254,21 @@ main = do
   Gtk.labelSetMarkup label1 ("<b>" <> "Done" <> "</b>")
 
   label2 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label2 ("<b>" <> "Temperature: 70" <> "</b>")
   -- Gtk.widgetOverrideFontSource label2
   -- Gtk.lebelSetFont label2
 
--- $title->modify_font(new PangoFontDescription("Times New Roman Italic 10"));
+-- $title->modify_font(new PangoFontDescription(Times New Roman Italic 10));
 
   -- label3 <- Gtk.labelNew Nothing
-  -- Gtk.labelSetMarkup label3 ("<b>" <> "Humidity: 50" <> "</b>")
 
   label4 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label4 ("<b>" <> "Pressure: 29.87" <> "</b>")
-
   label5 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label5 ("<b>" <> "Wind Chill: 54" <> "</b>")
-
   label6 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label6 ("<b>" <> "Wind Gust: 0" <> "</b>")
-
   label7 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label7 ("<b>" <> "Wind Speed: 5" <> "</b>")
-
   label8 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label8 ("<b>" <> "Heat Index: 5" <> "</b>")
-
   label9 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label9 ("<b>" <> "Dew Point: 5" <> "</b>")
-
   label10 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label10 ("<b>" <> "Precipitation Rate: 5" <> "</b>")
-
   label11 <- Gtk.labelNew Nothing
-  Gtk.labelSetMarkup label11 ("<b>" <> "Precipitation Total: 5" <> "</b>")
 
   btn1 <- Gtk.buttonNew
   Gtk.buttonSetRelief btn1 Gtk.ReliefStyleNone
@@ -239,7 +287,6 @@ main = do
 
   on win #keyPressEvent $ \keyEvent -> do
     key <- keyEvent `Data.GI.Base.get` #keyval >>= GDK.keyvalToUnicode
-    -- putStrLn $ "Key pressed: ‘" ++ (chr (fromIntegral key) : []) ++ "’ (" ++ show key ++ ")"
     putStrLn $ "Key pressed: (" ++ show key ++ ")"
     if key == 27 then Gtk.mainQuit else pure ()
     return False
@@ -280,6 +327,7 @@ main = do
   observation <- getObservation
   let imperialData = (imperial observation)
   -- let temperature = (temp imperialData)
+
   Gtk.labelSetMarkup label2 ("<b>" <> "Temperature: " <> pack (show (temp imperialData)) <> " F" <> "</b>")
   Gtk.labelSetMarkup label4 ("<b>" <> "Pressure: " <> pack (show (pressure imperialData)) <> "" <> "</b>")
   Gtk.labelSetMarkup label5 ("<b>" <> "Windchill: " <> pack (show (windChill imperialData)) <> "" <> "</b>")
