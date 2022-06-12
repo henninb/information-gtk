@@ -32,7 +32,8 @@ dependencies:
 - http-client
 - pretty-simple
 - aeson-casing
-- MissingH
+- utf8-string
+# - MissingH
 
 library:
   source-dirs: src

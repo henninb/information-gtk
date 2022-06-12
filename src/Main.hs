@@ -29,8 +29,10 @@ import Network.HTTP.Req
 -- import Data.Text.Lazy.Encoding    as TL
 -- import qualified Data.ByteString as B
 -- import qualified Data.ByteString as B
+import qualified Data.ByteString.Lazy.UTF8 as BLU -- from utf8-string
+-- import Data.ByteString.Lazy.UTF8 (toString)
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.ByteString.Lazy.Char8 as BL8
+-- import qualified Data.ByteString.Lazy.Char8 as BL8
 
 -- import Data.List.Utils (replace)
 
@@ -38,6 +40,7 @@ import qualified Data.ByteString.Lazy.Char8 as BL8
 -- import qualified Data.ByteString.Lazy as LBS
 -- import qualified Data.ByteString.Char8 as BS
 
+import Data.Text.Encoding
 import qualified Data.Text as T
 import Data.Text (pack)
 -- import Data.Text.Encoding
@@ -54,17 +57,19 @@ import Data.Aeson.Casing (aesonPrefix, pascalCase)
 
 type WeatherSchema = [schema|
   {
+  values: List
+  {
     id: Text,
-    v3-wx-observations-current: {
-      cloudCeiling: Maybe Text,
+    currentObservation: {
+      cloudCeiling: Maybe Float,
       cloudCoverPhrase: Text,
       dayOfWeek: Text,
       dayOrNight: Text,
       expirationTimeUtc: Int,
       iconCode: Int,
       iconCodeExtend: Int,
-      obsQualifierCode: Text,
-      obsQualifierSeverity: Int,
+      obsQualifierCode: Maybe Text,
+      obsQualifierSeverity: Maybe Int,
       precip1Hour: Float,
       precip6Hour: Float,
       precip24Hour: Float,
@@ -103,6 +108,7 @@ type WeatherSchema = [schema|
       wxPhraseMedium: Text,
       wxPhraseShort: Text
     }
+  }
   }
 |]
 
@@ -187,15 +193,15 @@ data Weather = Weather {
 } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
 data V3WxObservationsCurrent = V3WxObservationsCurrent {
-      cloudCeiling:: Maybe String,
+      cloudCeiling:: Maybe Double,
       cloudCoverPhrase:: String,
       dayOfWeek:: String,
       dayOrNight:: String,
       expirationTimeUtc:: Integer,
       iconCode:: Integer,
       iconCodeExtend:: Integer,
-      obsQualifierCode:: String,
-      obsQualifierSeverity:: Int,
+      obsQualifierCode:: Maybe String,
+      obsQualifierSeverity:: Maybe Int,
       precip1Hour:: Float,
       precip6Hour:: Float,
       precip24Hour:: Float,
@@ -264,13 +270,21 @@ getObservation :: IO Observation
 getObservation = do
   payload <- getWeather
   let response = (responseBody payload)
-
   let justObservations = fromJSONValue response :: Maybe Observations
   let observationList = (fromJust (justObservations))
   let list = (observations observationList)
   let observation = (head list)
   let imperialData = (imperial observation)
   return observation
+
+getApiWeather :: IO Weather
+getApiWeather = do
+  payload <- weatherApi
+  let response = (responseBody payload)
+  print response
+  let justObservations = fromJSONValue response :: Maybe Weather
+  let observationList = (fromJust (justObservations))
+  return (observationList)
 
 getObservationPayload :: IO BL.ByteString
 getObservationPayload = do
@@ -294,14 +308,14 @@ replace s find repl =
         then repl ++ (replace (drop (length find) s) find repl)
         else [head s] ++ (replace (tail s) find repl)
 
-findAndReplace current new = go
-  where
-    go bytes | BL.null bytes = mempty
-    go bytes =
-      case BL.splitAt (BL8.length current) bytes of
-        (ls,rs)
-          | ls == current -> new <> go rs
-          | otherwise -> BL.take 1 ls <> go (BL.drop 1 ls <> rs)
+-- findAndReplace current new = go
+--   where
+--     go bytes | BL.null bytes = mempty
+--     go bytes =
+--       case BL.splitAt (BL8.length current) bytes of
+--         (ls,rs)
+--           | ls == current -> new <> go rs
+--           | otherwise -> BL.take 1 ls <> go (BL.drop 1 ls <> rs)
 
 testme = do
   payload <- getObservationPayload -- (BL.ByteString)
@@ -312,20 +326,21 @@ testme = do
   print [Data.Aeson.Schema.get| output.observations[].stationID |]
   return ([Data.Aeson.Schema.get| output.observations[].imperial.temp |])
   -- print Right (zz)
-  --
 
 -- toStrict :: BL.ByteString -> BL8.ByteString
 -- toStrict = toByteString . fromLazyByteString
 
+testmeToo :: IO (Object WeatherSchema)
 testmeToo = do
   payload <- getWeatherApiPayload -- (BL.ByteString)
-  let payloadUpdated = findAndReplace "v3-wx-observations-current" "V3WxObservationsCurrent"
-  output <- either fail return $ eitherDecode payload :: IO (Object WeatherSchema)
-  print payload
-  print "-----"
-  print output
-  -- print [Data.Aeson.Schema.get| output.observations[].stationID |]
-  -- return ([Data.Aeson.Schema.get| output.observations[].imperial.temp |])
+  let payloadUpdated = BLU.toString payload
+  let payloadFinal = replace payloadUpdated "v3-wx-observations-current" "currentObservation"
+  let payloadx = BLU.fromString  ("{\"values\": " ++ payloadFinal ++ "}")
+  output <- either fail return $ eitherDecode payloadx :: IO (Object WeatherSchema)
+  print payloadx
+  print [Data.Aeson.Schema.get| output.values[].id |]
+  print [Data.Aeson.Schema.get| output.values[].currentObservation.temperature |]
+  return (output)
 
 main :: IO ()
 main = do
