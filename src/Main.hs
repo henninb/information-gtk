@@ -317,15 +317,14 @@ replace s find repl =
 --           | ls == current -> new <> go rs
 --           | otherwise -> BL.take 1 ls <> go (BL.drop 1 ls <> rs)
 
+testme :: IO (Object MySchema)
 testme = do
   payload <- getObservationPayload -- (BL.ByteString)
   output <- either fail return $ eitherDecode payload :: IO (Object MySchema)
-  print payload
-  print "-----"
-  print output
   print [Data.Aeson.Schema.get| output.observations[].stationID |]
-  return ([Data.Aeson.Schema.get| output.observations[].imperial.temp |])
+  -- return ([Data.Aeson.Schema.get| output.observations[].imperial.temp |])
   -- print Right (zz)
+  return (output)
 
 -- toStrict :: BL.ByteString -> BL8.ByteString
 -- toStrict = toByteString . fromLazyByteString
