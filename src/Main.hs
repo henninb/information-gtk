@@ -298,9 +298,6 @@ getWeatherApiPayload = do
   let response = (responseBody payload)
   return (Data.Aeson.encode response)
 
--- replace :: Eq a => [a] -> [a] -> [a] -> [a]
--- replace old new l = join new . split old $ l
-
 replace :: Eq a => [a] -> [a] -> [a] -> [a]
 replace [] _ _ = []
 replace s find repl =
@@ -308,14 +305,6 @@ replace s find repl =
         then repl ++ (replace (drop (length find) s) find repl)
         else [head s] ++ (replace (tail s) find repl)
 
--- findAndReplace current new = go
---   where
---     go bytes | BL.null bytes = mempty
---     go bytes =
---       case BL.splitAt (BL8.length current) bytes of
---         (ls,rs)
---           | ls == current -> new <> go rs
---           | otherwise -> BL.take 1 ls <> go (BL.drop 1 ls <> rs)
 
 testme :: IO (Object MySchema)
 testme = do
@@ -326,9 +315,6 @@ testme = do
   -- print Right (zz)
   return (output)
 
--- toStrict :: BL.ByteString -> BL8.ByteString
--- toStrict = toByteString . fromLazyByteString
-
 testmeToo :: IO (Object WeatherSchema)
 testmeToo = do
   payload <- getWeatherApiPayload -- (BL.ByteString)
@@ -337,8 +323,8 @@ testmeToo = do
   let payloadx = BLU.fromString  ("{\"values\": " ++ payloadFinal ++ "}")
   output <- either fail return $ eitherDecode payloadx :: IO (Object WeatherSchema)
   print payloadx
-  print [Data.Aeson.Schema.get| output.values[].id |]
-  print [Data.Aeson.Schema.get| output.values[].currentObservation.temperature |]
+  -- print [Data.Aeson.Schema.get| output.values[].id |]
+  -- print [Data.Aeson.Schema.get| output.values[].currentObservation.temperature |]
   return (output)
 
 main :: IO ()
@@ -448,4 +434,20 @@ main = do
   Gtk.labelSetMarkup label9 ("<b>" <> "Dew Point: " <> pack (show (dewpt imperialData)) <> "" <> "</b>")
   Gtk.labelSetMarkup label10 ("<b>" <> "Precipitation Rate: " <> pack (show (precipRate imperialData)) <> "" <> "</b>")
   Gtk.labelSetMarkup label11 ("<b>" <> "Precipitation: " <> pack (show (precipTotal imperialData)) <> "" <> "</b>")
+
+  obs <- testmeToo
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureFeelsLike |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureDewPoint |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureHeatIndex |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureTendencyTrend |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.relativeHumidity |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunriseTimeLocal |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunsetTimeLocal |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windDirectionCardinal |])
+  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.wxPhraseLong |])
   Gtk.main
