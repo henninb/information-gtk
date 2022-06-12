@@ -30,12 +30,25 @@ import Network.HTTP.Req
 -- import qualified Data.ByteString as B
 -- import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
--- import qualified Data.Text as T
+import qualified Data.ByteString.Lazy.Char8 as BL8
+
+-- import Data.List.Utils (replace)
+
+
+-- import qualified Data.ByteString.Lazy as LBS
+-- import qualified Data.ByteString.Char8 as BS
+
+import qualified Data.Text as T
 import Data.Text (pack)
 -- import Data.Text.Encoding
 import Text.JSON.Generic (Typeable)
 -- import qualified Data.Aeson.Schema as DAS
 import Data.Aeson.Schema (schema, Object, get)
+import Data.Aeson.Casing.Internal (snakeCase)
+
+import Data.Aeson.Casing (aesonPrefix, pascalCase)
+-- import Data.Aeson.Casing
+-- Data.Aeson.Casing.Internal (kebabCase)
 -- import qualified Network.HTTP.Client as HTTPClient
 -- type TestSchema = [schema| #List | { id: Text }} |]
 
@@ -92,6 +105,9 @@ type WeatherSchema = [schema|
     }
   }
 |]
+
+-- instance FromJSON Account where
+--   parseJSON = genericParseJSON $ aesonPrefix snakeCase
 
 type MySchema = [schema|
  {
@@ -166,10 +182,11 @@ data Observation  = Observation {
 data Weather = Weather {
     id:: String,
     -- v3-wx-observations-current:: ObservationV3
-     observation3:: ObservationV3
+    -- V3WxObservationsCurrent:: ObservationV3
+     observation3:: V3WxObservationsCurrent
 } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
-data ObservationV3 = ObservationV3 {
+data V3WxObservationsCurrent = V3WxObservationsCurrent {
       cloudCeiling:: Maybe String,
       cloudCoverPhrase:: String,
       dayOfWeek:: String,
@@ -267,6 +284,25 @@ getWeatherApiPayload = do
   let response = (responseBody payload)
   return (Data.Aeson.encode response)
 
+-- replace :: Eq a => [a] -> [a] -> [a] -> [a]
+-- replace old new l = join new . split old $ l
+
+replace :: Eq a => [a] -> [a] -> [a] -> [a]
+replace [] _ _ = []
+replace s find repl =
+    if take (length find) s == find
+        then repl ++ (replace (drop (length find) s) find repl)
+        else [head s] ++ (replace (tail s) find repl)
+
+findAndReplace current new = go
+  where
+    go bytes | BL.null bytes = mempty
+    go bytes =
+      case BL.splitAt (BL8.length current) bytes of
+        (ls,rs)
+          | ls == current -> new <> go rs
+          | otherwise -> BL.take 1 ls <> go (BL.drop 1 ls <> rs)
+
 testme = do
   payload <- getObservationPayload -- (BL.ByteString)
   output <- either fail return $ eitherDecode payload :: IO (Object MySchema)
@@ -276,9 +312,14 @@ testme = do
   print [Data.Aeson.Schema.get| output.observations[].stationID |]
   return ([Data.Aeson.Schema.get| output.observations[].imperial.temp |])
   -- print Right (zz)
+  --
+
+-- toStrict :: BL.ByteString -> BL8.ByteString
+-- toStrict = toByteString . fromLazyByteString
 
 testmeToo = do
   payload <- getWeatherApiPayload -- (BL.ByteString)
+  let payloadUpdated = findAndReplace "v3-wx-observations-current" "V3WxObservationsCurrent"
   output <- either fail return $ eitherDecode payload :: IO (Object WeatherSchema)
   print payload
   print "-----"

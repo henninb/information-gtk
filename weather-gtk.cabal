@@ -25,7 +25,8 @@ library
   hs-source-dirs:
       src
   build-depends:
-      aeson
+      MissingH
+    , aeson
     , aeson-casing
     , aeson-schemas
     , base >=4.7 && <5
@@ -59,7 +60,8 @@ executable weather-gtk
       src
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aeson
+      MissingH
+    , aeson
     , aeson-casing
     , aeson-schemas
     , base >=4.7 && <5
@@ -94,7 +96,8 @@ test-suite weather-gtk-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aeson
+      MissingH
+    , aeson
     , aeson-casing
     , aeson-schemas
     , base >=4.7 && <5

@@ -31,6 +31,8 @@ dependencies:
 - aeson-schemas
 - http-client
 - pretty-simple
+- aeson-casing
+- MissingH
 
 library:
   source-dirs: src
