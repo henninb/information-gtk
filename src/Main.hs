@@ -344,21 +344,21 @@ main = do
   Gtk.windowSetDecorated win False
 
   img1 <- Gtk.imageNewFromFile $ home ++ "/.local/img/cancel.png"
-  img2 <- Gtk.imageNewFromFile $ home ++ "/.local/img/logout.png"
+  -- img2 <- Gtk.imageNewFromFile $ home ++ "/.local/img/logout.png"
 
   label1 <- Gtk.labelNew Nothing
   Gtk.labelSetMarkup label1 ("<b>" <> "Done" <> "</b>")
 
-  label2 <- Gtk.labelNew Nothing
-  -- Gtk.widgetOverrideFontSource label2
-  -- Gtk.lebelSetFont label2
+  temperatureLabel <- Gtk.labelNew Nothing
+  -- Gtk.widgetOverrideFontSource temperatureLabel
+  -- Gtk.lebelSetFont temperatureLabel
 
 -- $title->modify_font(new PangoFontDescription("Times New Roman Italic 10"));
 
   -- label3 <- Gtk.labelNew Nothing
   -- Gtk.labelSetMarkup label3 ("<b>" <> "Humidity: 50" <> "</b>")
 
-  label4 <- Gtk.labelNew Nothing
+  pressureLabel <- Gtk.labelNew Nothing
   label5 <- Gtk.labelNew Nothing
   label6 <- Gtk.labelNew Nothing
   label7 <- Gtk.labelNew Nothing
@@ -375,12 +375,12 @@ main = do
     putStrLn "User chose: Done"
     Gtk.widgetDestroy win
 
-  btn2 <- Gtk.buttonNew
-  Gtk.buttonSetRelief btn2 Gtk.ReliefStyleNone
-  Gtk.buttonSetImage btn2 $ Just img2
-  Gtk.widgetSetHexpand btn2 False
-  on btn2 #clicked $ do
-    print "test"
+  -- btn2 <- Gtk.buttonNew
+  -- Gtk.buttonSetRelief btn2 Gtk.ReliefStyleNone
+  -- Gtk.buttonSetImage btn2 $ Just img2
+  -- Gtk.widgetSetHexpand btn2 False
+  -- on btn2 #clicked $ do
+  --   print "test"
 
   on win #keyPressEvent $ \keyEvent -> do
     key <- keyEvent `Data.GI.Base.get` #keyval >>= GDK.keyvalToUnicode
@@ -397,9 +397,9 @@ main = do
   #attach grid btn1   0 0 1 1
   #attach grid label1 0 1 1 1
   -- #attach grid btn2   1 0 1 1
-  #attach grid label2 1 1 1 1
+  #attach grid temperatureLabel 1 1 1 1
   -- #attach grid label3 1 2 1 1
-  #attach grid label4 1 2 1 1
+  #attach grid pressureLabel 1 2 1 1
   #attach grid label5 1 3 1 1
   #attach grid label6 1 4 1 1
   #attach grid label7 1 5 1 1
@@ -422,11 +422,13 @@ main = do
   -- obj <- either fail return =<<
   --   eitherDecodeFileStrict "example.json" :: IO (DAS.Object MySchema)
   -- print [DAS.get| obj.observations[].stationID |]
+  obs <- testmeToo
   observation <- getObservation
   let imperialData = (imperial observation)
   -- let temperature = (temp imperialData)
-  Gtk.labelSetMarkup label2 ("<b>" <> "Temperature: " <> pack (show (temp imperialData)) <> " F" <> "</b>")
-  Gtk.labelSetMarkup label4 ("<b>" <> "Pressure: " <> pack (show (pressure imperialData)) <> "" <> "</b>")
+  -- Gtk.labelSetMarkup temperatureLabel ("<b>" <> "Temperature: " <> pack (show (temp imperialData)) <> " F" <> "</b>")
+  Gtk.labelSetMarkup temperatureLabel ("<b>" <> "Temperature: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |])) <> " F" <> "</b>")
+  Gtk.labelSetMarkup pressureLabel ("<b>" <> "Pressure: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label5 ("<b>" <> "Windchill: " <> pack (show (windChill imperialData)) <> "" <> "</b>")
   Gtk.labelSetMarkup label6 ("<b>" <> "Wind Gust: " <> pack (show (windGust imperialData)) <> "" <> "</b>")
   Gtk.labelSetMarkup label7 ("<b>" <> "Wind Speed: " <> pack (show (windSpeed imperialData)) <> "" <> "</b>")
@@ -435,7 +437,6 @@ main = do
   Gtk.labelSetMarkup label10 ("<b>" <> "Precipitation Rate: " <> pack (show (precipRate imperialData)) <> "" <> "</b>")
   Gtk.labelSetMarkup label11 ("<b>" <> "Precipitation: " <> pack (show (precipTotal imperialData)) <> "" <> "</b>")
 
-  obs <- testmeToo
   print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |])
   print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureFeelsLike |])
   print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureDewPoint |])
