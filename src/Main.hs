@@ -34,6 +34,14 @@ import Data.Aeson.Casing.Internal (snakeCase)
 import Data.Typeable (typeOf)
 
 import Data.Aeson.Casing (aesonPrefix, pascalCase)
+import Data.Time (getCurrentTime)
+import Data.Time.Format
+-- import Data.Time.Clock
+-- import Data.Time.Calendar
+-- date :: IO (Integer,Int,Int) -- :: (year,month,day)
+-- date = getCurrentTime >>= return . toGregorian . utctDay
+
+
 
 type WeatherSchema = [schema|
   {
@@ -477,4 +485,9 @@ main = do
   print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])
   print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windDirectionCardinal |])
   print . unpack . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.wxPhraseLong |]
+  print =<< getCurrentTime
+
+  now <- getCurrentTime
+  let ff = formatTime defaultTimeLocale "%Y%m%d" now
+
   Gtk.main
