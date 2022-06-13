@@ -11,3 +11,4 @@ https://williamyaoh.com/posts/2019-10-19-a-cheatsheet-to-json-handling.html
 https://mmhaskell.com/blog/2017/6/5/flexible-data-with-aeson
 
 curl -s 'https://api.weather.com/v3/aggcommon/v3alertsHeadlines;v3-wx-observations-current;v3-location-point?apiKey=e1f10a1e78da46f5b10a1e78da96f525&geocodes=45.18,-93.32&language=en-US&units=e&format=json' | jq
+curl -s 'https://api.weather.com/v3/aggcommon/v3-wx-observations-current?apiKey=e1f10a1e78da46f5b10a1e78da96f525&geocodes=45.18,-93.32&language=en-US&units=e&format=json' | jq
