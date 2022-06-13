@@ -31,6 +31,7 @@ import Text.JSON.Generic (Typeable)
 -- import qualified Data.Aeson.Schema as DAS
 import Data.Aeson.Schema (schema, Object, get)
 import Data.Aeson.Casing.Internal (snakeCase)
+import Data.Typeable (typeOf)
 
 import Data.Aeson.Casing (aesonPrefix, pascalCase)
 
@@ -297,7 +298,16 @@ testmeToo = do
 zz :: IO T.Text
 zz = do
   obs <- testmeToo
-  let x = pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]))
+  -- let x = pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]))
+  print . pack . show . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]
+  print . show . unpack . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]
+  print . fromString . unpack . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]
+  -- let x = pack . show . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]
+  let x = pack . show . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]
+  print (typeOf (head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]))
+  print (typeOf (show . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]))
+  print (typeOf (pack . show . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]))
+  print (head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |])
   return (x)
 
 main :: IO ()
