@@ -237,7 +237,7 @@ dateFormat = do
   now <- getCurrentTime
   return ( formatTime defaultTimeLocale "%Y%m%d" now)
 
-forecastApi :: IO (JsonResponse Value)
+forecastApi :: IO Value
 forecastApi =
   runReq defaultHttpConfig $ do
   response <- req GET (https "api.weather.com" /: "v3" /: "wx" /: "forecast" /: "daily" /: "10day") NoReqBody jsonResponse $
@@ -246,9 +246,10 @@ forecastApi =
     "units" =: ("e" :: String) <>
     "language" =: ("en-US" :: String) <>
     "format" =: ("json" :: String)
-  return response
+  return (responseBody response)
 
-astroApi :: IO (JsonResponse Value)
+-- astroApi :: IO (JsonResponse Value)
+astroApi :: IO Value
 astroApi = do
   now <- getCurrentTime
   runReq defaultHttpConfig $ do
@@ -258,8 +259,8 @@ astroApi = do
       "days" =: ("7" :: String) <>
       "date" =: (formatTime defaultTimeLocale "%Y%m%d" now :: String) <>
       "format" =: ("json" :: String)
-  return response
-  -- return (responseBody response)
+  -- return response
+  return (responseBody response)
 
 weatherApi :: IO (JsonResponse Value)
 weatherApi =
@@ -272,7 +273,7 @@ weatherApi =
     "format" =: ("json" :: String)
   return response
 
-getWeather :: IO (JsonResponse Value)
+getWeather :: IO Value
 getWeather =
   runReq defaultHttpConfig $ do
   response <- req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
@@ -280,7 +281,7 @@ getWeather =
     "units" =: ("e" :: String) <>
     "stationId" =: ("KMNCOONR65" :: String) <>
     "format" =: ("json" :: String)
-  return response
+  return (responseBody response)
 
 fromJSONValue :: FromJSON a => Value -> Maybe a
 fromJSONValue = parseMaybe parseJSON
@@ -295,10 +296,8 @@ fromJSONValue = parseMaybe parseJSON
 getObservation :: IO Observation
 getObservation = do
   payload <- getWeather
-  let response = (responseBody payload)
-  let xx = Data.Aeson.encode response
-  print . typeOf $ response
-  let justObservations = fromJSONValue response :: Maybe Observations
+  print . typeOf $ payload
+  let justObservations = fromJSONValue payload :: Maybe Observations
   let observationList = (fromJust (justObservations))
   let list = (observations observationList)
   let observation = (head list)
@@ -319,8 +318,7 @@ getApiWeather = do
 getObservationPayload :: IO BL.ByteString
 getObservationPayload = do
   payload <- getWeather
-  let response = (responseBody payload)
-  return (Data.Aeson.encode response)
+  return (Data.Aeson.encode payload)
 
 getWeatherApiPayload :: IO BL.ByteString
 getWeatherApiPayload = do
