@@ -232,6 +232,11 @@ data V3WxObservationsCurrent = V3WxObservationsCurrent {
 fromJust (Just x) = x
 fromJust Nothing = error "Maybe.fromJust: Nothing"
 
+dateFormat :: IO String
+dateFormat = do
+  now <- getCurrentTime
+  return ( formatTime defaultTimeLocale "%Y%m%d" now)
+
 forecastApi :: IO (JsonResponse Value)
 forecastApi =
   runReq defaultHttpConfig $
@@ -244,13 +249,14 @@ forecastApi =
 
 astroApi :: IO (JsonResponse Value)
 astroApi =
-  runReq defaultHttpConfig $
-  req GET (https "api.weather.com" /: "v2" /: "astro") NoReqBody jsonResponse $
-  "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
-  "geocode" =: ("45.18,-93.32" :: String) <>
-  "days" =: ("15" :: String) <>
-  "date" =: ("20220613" :: String) <>
-  "format" =: ("json" :: String)
+  runReq defaultHttpConfig $ do
+    response <- req GET (https "api.weather.com" /: "v2" /: "astro") NoReqBody jsonResponse $
+      "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+      "geocode" =: ("45.18,-93.32" :: String) <>
+      "days" =: ("7" :: String) <>
+      "date" =: ("20220613" :: String) <>
+      "format" =: ("json" :: String)
+    return response
 
 weatherApi :: IO (JsonResponse Value)
 weatherApi =
