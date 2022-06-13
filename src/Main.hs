@@ -285,6 +285,7 @@ getObservation :: IO Observation
 getObservation = do
   payload <- getWeather
   let response = (responseBody payload)
+  let xx = Data.Aeson.encode response
   print . typeOf $ response
   let justObservations = fromJSONValue response :: Maybe Observations
   let observationList = (fromJust (justObservations))
@@ -297,7 +298,9 @@ getApiWeather :: IO Weather
 getApiWeather = do
   payload <- weatherApi
   let response = (responseBody payload)
-  print response
+  let xx = Data.Aeson.encode response
+  -- print . typeOf $ xx
+  -- print response
   let justObservations = fromJSONValue response :: Maybe Weather
   let observationList = (fromJust (justObservations))
   return (observationList)
