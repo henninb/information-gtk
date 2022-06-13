@@ -224,6 +224,26 @@ data V3WxObservationsCurrent = V3WxObservationsCurrent {
 fromJust (Just x) = x
 fromJust Nothing = error "Maybe.fromJust: Nothing"
 
+forecastApi :: IO (JsonResponse Value)
+forecastApi =
+  runReq defaultHttpConfig $
+  req GET (https "api.weather.com" /: "v3" /: "wx" /: "forecast" /: "daily" /: "10day") NoReqBody jsonResponse $
+  "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+  "geocode" =: ("45.18,-93.32" :: String) <>
+  "units" =: ("e" :: String) <>
+  "language" =: ("en-US" :: String) <>
+  "format" =: ("json" :: String)
+
+astroApi :: IO (JsonResponse Value)
+astroApi =
+  runReq defaultHttpConfig $
+  req GET (https "api.weather.com" /: "v2" /: "astro") NoReqBody jsonResponse $
+  "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+  "geocode" =: ("45.18,-93.32" :: String) <>
+  "days" =: ("15" :: String) <>
+  "date" =: ("20220613" :: String) <>
+  "format" =: ("json" :: String)
+
 weatherApi :: IO (JsonResponse Value)
 weatherApi =
   runReq defaultHttpConfig $
@@ -246,10 +266,18 @@ getWeather =
 fromJSONValue :: FromJSON a => Value -> Maybe a
 fromJSONValue = parseMaybe parseJSON
 
+
+-- parseWeatherFromString :: String -> Maybe Weather
+-- parseWeatherFromString s = let bs = pack s
+--                        in case parse json bs of
+--                                (Done rest r) -> parseMaybe parseJSON r :: Maybe Weather
+--                                _             -> Nothing
+
 getObservation :: IO Observation
 getObservation = do
   payload <- getWeather
   let response = (responseBody payload)
+  print . typeOf $ response
   let justObservations = fromJSONValue response :: Maybe Observations
   let observationList = (fromJust (justObservations))
   let list = (observations observationList)
