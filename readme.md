@@ -14,3 +14,7 @@ curl -s 'https://api.weather.com/v3/aggcommon/v3alertsHeadlines;v3-wx-observatio
 curl -s 'https://api.weather.com/v3/aggcommon/v3-wx-observations-current?apiKey=e1f10a1e78da46f5b10a1e78da96f525&geocodes=45.18,-93.32&language=en-US&units=e&format=json' | jq
 
 curl -s 'https://api.weather.com/v3/wx/forecast/daily/10day?apiKey=e1f10a1e78da46f5b10a1e78da96f525&geocode=44.977,-93.265&units=e&language=en-US&format=json'
+
+curl -s 'https://api.weather.com/v2/astro?apiKey=e1f10a1e78da46f5b10a1e78da96f525&geocode=44.977,-93.265&days=15&date=20220613&format=json'
+
+curl -s 'https://api.weather.com/v3/dateTime?apiKey=e1f10a1e78da46f5b10a1e78da96f525&geocode=44.977,-93.265&format=json'
