@@ -239,43 +239,48 @@ dateFormat = do
 
 forecastApi :: IO (JsonResponse Value)
 forecastApi =
-  runReq defaultHttpConfig $
-  req GET (https "api.weather.com" /: "v3" /: "wx" /: "forecast" /: "daily" /: "10day") NoReqBody jsonResponse $
-  "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
-  "geocode" =: ("45.18,-93.32" :: String) <>
-  "units" =: ("e" :: String) <>
-  "language" =: ("en-US" :: String) <>
-  "format" =: ("json" :: String)
+  runReq defaultHttpConfig $ do
+  response <- req GET (https "api.weather.com" /: "v3" /: "wx" /: "forecast" /: "daily" /: "10day") NoReqBody jsonResponse $
+    "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+    "geocode" =: ("45.18,-93.32" :: String) <>
+    "units" =: ("e" :: String) <>
+    "language" =: ("en-US" :: String) <>
+    "format" =: ("json" :: String)
+  return response
 
 astroApi :: IO (JsonResponse Value)
-astroApi =
+astroApi = do
+  now <- getCurrentTime
   runReq defaultHttpConfig $ do
-    response <- req GET (https "api.weather.com" /: "v2" /: "astro") NoReqBody jsonResponse $
+  response <- req GET (https "api.weather.com" /: "v2" /: "astro") NoReqBody jsonResponse $
       "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
       "geocode" =: ("45.18,-93.32" :: String) <>
       "days" =: ("7" :: String) <>
-      "date" =: ("20220613" :: String) <>
+      "date" =: (formatTime defaultTimeLocale "%Y%m%d" now :: String) <>
       "format" =: ("json" :: String)
-    return response
+  return response
+  -- return (responseBody response)
 
 weatherApi :: IO (JsonResponse Value)
 weatherApi =
-  runReq defaultHttpConfig $
-  req GET (https "api.weather.com" /: "v3" /: "aggcommon" /: "v3-wx-observations-current") NoReqBody jsonResponse $
-  "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
-  "geocodes" =: ("45.18,-93.32" :: String) <>
-  "units" =: ("e" :: String) <>
-  "language" =: ("en-US" :: String) <>
-  "format" =: ("json" :: String)
+  runReq defaultHttpConfig $ do
+  response <- req GET (https "api.weather.com" /: "v3" /: "aggcommon" /: "v3-wx-observations-current") NoReqBody jsonResponse $
+    "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+    "geocodes" =: ("45.18,-93.32" :: String) <>
+    "units" =: ("e" :: String) <>
+    "language" =: ("en-US" :: String) <>
+    "format" =: ("json" :: String)
+  return response
 
 getWeather :: IO (JsonResponse Value)
 getWeather =
-  runReq defaultHttpConfig $
-  req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
-  "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
-  "units" =: ("e" :: String) <>
-  "stationId" =: ("KMNCOONR65" :: String) <>
-  "format" =: ("json" :: String)
+  runReq defaultHttpConfig $ do
+  response <- req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
+    "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+    "units" =: ("e" :: String) <>
+    "stationId" =: ("KMNCOONR65" :: String) <>
+    "format" =: ("json" :: String)
+  return response
 
 fromJSONValue :: FromJSON a => Value -> Maybe a
 fromJSONValue = parseMaybe parseJSON
@@ -478,25 +483,5 @@ main = do
   Gtk.labelSetMarkup label20 ("<b>" <> "Pressure Tendency: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureTendencyTrend |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label21 ("<b>" <> "Cloud Cover: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.cloudCoverPhrase |])) <> "" <> "</b>")
   -- Gtk.labelSetMarkup label21 ("<b>" <> "Cloud Cover: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.cloudCoverPhrase |])) <> "" <> "</b>")
-  -- snow
-
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureFeelsLike |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureDewPoint |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureHeatIndex |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureTendencyTrend |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.relativeHumidity |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunriseTimeLocal |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunsetTimeLocal |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])
-  print (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windDirectionCardinal |])
-  print . unpack . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.wxPhraseLong |]
-  print =<< getCurrentTime
-
-  now <- getCurrentTime
-  let ff = formatTime defaultTimeLocale "%Y%m%d" now
 
   Gtk.main
