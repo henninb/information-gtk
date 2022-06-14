@@ -135,45 +135,40 @@ type MySchema = [schema|
 }
 |]
 
--- newtype MyValue = MyValue T.Text
--- -- instance Show Value where show (Value val) = show val
--- instance Show MyValue where
---     show (MyValue val) = unpack val
+-- newtype Observations = Observations
+--   { observations :: [Observation]
+--   } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
-newtype Observations = Observations
-  { observations :: [Observation]
-  } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+-- data Imperial = Imperial {
+--   temp :: Integer,
+--   heatIndex :: Integer,
+--   dewpt :: Integer,
+--   windChill :: Integer,
+--   windSpeed :: Integer,
+--   windGust :: Integer,
+--   pressure :: Double,
+--   precipRate :: Double,
+--   precipTotal :: Double,
+--   elev :: Integer
+-- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
-data Imperial = Imperial {
-  temp :: Integer,
-  heatIndex :: Integer,
-  dewpt :: Integer,
-  windChill :: Integer,
-  windSpeed :: Integer,
-  windGust :: Integer,
-  pressure :: Double,
-  precipRate :: Double,
-  precipTotal :: Double,
-  elev :: Integer
-} deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
-
-data Observation  = Observation {
-  stationID :: String,
-  obsTimeUtc :: String,
-  neighborhood :: String,
-  softwareType :: Maybe String,
-  country:: String,
-  solarRadiation :: Double,
-  lon :: Double,
-  realtimeFrequency :: Maybe String,
-  epoch :: Integer,
-  lat :: Double,
-  uv :: Integer,
-  winddir :: Integer,
-  humidity :: Integer,
-  qcStatus :: Integer,
-  imperial :: Imperial
-} deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
+-- data Observation  = Observation {
+--   stationID :: String,
+--   obsTimeUtc :: String,
+--   neighborhood :: String,
+--   softwareType :: Maybe String,
+--   country:: String,
+--   solarRadiation :: Double,
+--   lon :: Double,
+--   realtimeFrequency :: Maybe String,
+--   epoch :: Integer,
+--   lat :: Double,
+--   uv :: Integer,
+--   winddir :: Integer,
+--   humidity :: Integer,
+--   qcStatus :: Integer,
+--   imperial :: Imperial
+-- } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
 data Weather = Weather {
     id:: String,
@@ -222,8 +217,8 @@ data V3WxObservationsCurrent = V3WxObservationsCurrent {
       visibility:: Int,
       windDirection:: Int,
       windDirectionCardinal:: String,
-      -- windGust:: Maybe Int,
-      -- windSpeed:: Int,
+      windGust:: Maybe Int,
+      windSpeed:: Int,
       wxPhraseLong:: String,
       wxPhraseMedium:: String,
       wxPhraseShort:: String
@@ -232,52 +227,51 @@ data V3WxObservationsCurrent = V3WxObservationsCurrent {
 fromJust (Just x) = x
 fromJust Nothing = error "Maybe.fromJust: Nothing"
 
-dateFormat :: IO String
-dateFormat = do
-  now <- getCurrentTime
-  return ( formatTime defaultTimeLocale "%Y%m%d" now)
+-- dateFormat :: IO String
+-- dateFormat = do
+--   now <- getCurrentTime
+--   return ( formatTime defaultTimeLocale "%Y%m%d" now)
+apiKey = "e1f10a1e78da46f5b10a1e78da96f525"
 
 forecastApi :: IO Value
 forecastApi =
   runReq defaultHttpConfig $ do
   response <- req GET (https "api.weather.com" /: "v3" /: "wx" /: "forecast" /: "daily" /: "10day") NoReqBody jsonResponse $
-    "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+    "apiKey" =: (apiKey :: String) <>
     "geocode" =: ("45.18,-93.32" :: String) <>
     "units" =: ("e" :: String) <>
     "language" =: ("en-US" :: String) <>
     "format" =: ("json" :: String)
   return (responseBody response)
 
--- astroApi :: IO (JsonResponse Value)
 astroApi :: IO Value
 astroApi = do
   now <- getCurrentTime
   runReq defaultHttpConfig $ do
   response <- req GET (https "api.weather.com" /: "v2" /: "astro") NoReqBody jsonResponse $
-      "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+      "apiKey" =: (apiKey :: String) <>
       "geocode" =: ("45.18,-93.32" :: String) <>
       "days" =: ("7" :: String) <>
       "date" =: (formatTime defaultTimeLocale "%Y%m%d" now :: String) <>
       "format" =: ("json" :: String)
-  -- return response
   return (responseBody response)
 
-weatherApi :: IO (JsonResponse Value)
+weatherApi :: IO Value
 weatherApi =
   runReq defaultHttpConfig $ do
   response <- req GET (https "api.weather.com" /: "v3" /: "aggcommon" /: "v3-wx-observations-current") NoReqBody jsonResponse $
-    "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+    "apiKey" =: (apiKey :: String) <>
     "geocodes" =: ("45.18,-93.32" :: String) <>
     "units" =: ("e" :: String) <>
     "language" =: ("en-US" :: String) <>
     "format" =: ("json" :: String)
-  return response
+  return (responseBody response)
 
 getWeather :: IO Value
 getWeather =
   runReq defaultHttpConfig $ do
   response <- req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
-    "apiKey" =: ("e1f10a1e78da46f5b10a1e78da96f525" :: String) <>
+    "apiKey" =: (apiKey :: String) <>
     "units" =: ("e" :: String) <>
     "stationId" =: ("KMNCOONR65" :: String) <>
     "format" =: ("json" :: String)
@@ -293,38 +287,36 @@ fromJSONValue = parseMaybe parseJSON
 --                                (Done rest r) -> parseMaybe parseJSON r :: Maybe Weather
 --                                _             -> Nothing
 
-getObservation :: IO Observation
-getObservation = do
-  payload <- getWeather
-  print . typeOf $ payload
-  let justObservations = fromJSONValue payload :: Maybe Observations
-  let observationList = (fromJust (justObservations))
-  let list = (observations observationList)
-  let observation = (head list)
-  let imperialData = (imperial observation)
-  return observation
+-- getObservation :: IO Observation
+-- getObservation = do
+--   payload <- getWeather
+--   print . typeOf $ payload
+--   let justObservations = fromJSONValue payload :: Maybe Observations
+--   let observationList = (fromJust (justObservations))
+--   let list = (observations observationList)
+--   let observation = (head list)
+--   let imperialData = (imperial observation)
+--   return observation
 
 getApiWeather :: IO Weather
 getApiWeather = do
   payload <- weatherApi
-  let response = (responseBody payload)
-  let xx = Data.Aeson.encode response
+  -- let xx = Data.Aeson.encode payload
   -- print . typeOf $ xx
   -- print response
-  let justObservations = fromJSONValue response :: Maybe Weather
+  let justObservations = fromJSONValue payload :: Maybe Weather
   let observationList = (fromJust (justObservations))
   return (observationList)
 
-getObservationPayload :: IO BL.ByteString
-getObservationPayload = do
-  payload <- getWeather
-  return (Data.Aeson.encode payload)
+-- getObservationPayload :: IO BL.ByteString
+-- getObservationPayload = do
+--   payload <- getWeather
+--   return (Data.Aeson.encode payload)
 
-getWeatherApiPayload :: IO BL.ByteString
-getWeatherApiPayload = do
-  payload <- weatherApi
-  let response = (responseBody payload)
-  return (Data.Aeson.encode response)
+-- getWeatherApiPayload :: IO BL.ByteString
+-- getWeatherApiPayload = do
+--   payload <- weatherApi
+--   return (Data.Aeson.encode payload)
 
 replace :: Eq a => [a] -> [a] -> [a] -> [a]
 replace [] _ _ = []
@@ -336,8 +328,9 @@ replace s find repl =
 
 testmeToo :: IO (Object WeatherSchema)
 testmeToo = do
-  payload <- getWeatherApiPayload -- (BL.ByteString)
-  let payloadUpdated = BLU.toString payload
+  payload <- weatherApi
+  let myPayload = Data.Aeson.encode payload -- (BL.ByteString)
+  let payloadUpdated = BLU.toString myPayload
   let payloadFinal = replace payloadUpdated "v3-wx-observations-current" "currentObservation"
   let payloadx = BLU.fromString  ("{\"values\": " ++ payloadFinal ++ "}")
   output <- either fail return $ eitherDecode payloadx :: IO (Object WeatherSchema)
@@ -459,8 +452,8 @@ main = do
   #showAll win
 
   obs <- testmeToo
-  observation <- getObservation
-  let imperialData = (imperial observation)
+  -- observation <- getObservation
+  -- let imperialData = (imperial observation)
   Gtk.labelSetMarkup temperatureLabel ("<b>" <> "Temperature: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |])) <> " F" <> "</b>")
   Gtk.labelSetMarkup pressureLabel ("<b>" <> "Pressure: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label5 ("<b>" <> "WindChill: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])) <> "" <> "</b>")
