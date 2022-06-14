@@ -240,18 +240,19 @@ forecastApi =
     "format" =: ("json" :: String)
   return (responseBody response)
 
--- TODO: fix
--- astroApi :: IO Value
--- astroApi = do
---   -- runReq defaultHttpConfig $
---   now <- getCurrentTime
---   response <- req GET (https "api.weather.com" /: "v2" /: "astro") NoReqBody jsonResponse $
---       "apiKey" =: (apiKey :: String) <>
---       "geocode" =: ("45.18,-93.32" :: String) <>
---       "days" =: ("7" :: String) <>
---       "date" =: (formatTime defaultTimeLocale "%Y%m%d" now :: String) <>
---       "format" =: ("json" :: String)
---   return (responseBody response)
+astroApi :: IO Value
+astroApi = do
+    now <- getCurrentTime
+    response <- runReq defaultHttpConfig $ req
+      GET
+      (https "api.weather.com" /: "v2" /: "astro") NoReqBody jsonResponse $
+      "apiKey" =: (apiKey :: String) <>
+      "geocode" =: ("45.18,-93.32" :: String) <>
+      "days" =: ("7" :: String) <>
+      "date" =: (formatTime defaultTimeLocale "%Y%m%d" now :: String) <>
+      "format" =: ("json" :: String)
+    -- print (responseBody response :: Value)
+    return (responseBody response)
 
 weatherApi :: IO Value
 weatherApi =
@@ -434,9 +435,6 @@ main = do
   -- bh - wind gust returns a Just
   let windGustJust = (head ([Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |]))
   let windGust = fromJust windGustJust
-  -- print . typeOf $ windGust
-  -- print . typeOf $ x
-
   Gtk.labelSetMarkup label6 ("<b>" <> "WindGust: " <> pack (show (windGust)) <> "" <> "</b>")
   -- Gtk.labelSetMarkup label6 ("<b>" <> "WindGust: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label7 ("<b>" <> "WindSpeed: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])) <> "" <> "</b>")
