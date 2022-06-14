@@ -17,7 +17,7 @@ curl -s 'https://api.weather.com/v3/wx/forecast/daily/10day?apiKey=e1f10a1e78da4
 
 curl -s 'https://api.weather.com/v2/astro?apiKey=e1f10a1e78da46f5b10a1e78da96f525&geocode=44.977,-93.265&days=15&date=20220613&format=json'
 
-curl -s 'https://api.weather.com/v3/dateTime?apiKey=e1f10a1e78da46f5b10a1e78da96f525&geocode=44.977,-93.265&format=json'
+curl -s 'https://api.weather.com/v3/dateTime?apiKey=e1f10a1e78da46f5b10a1e78da96f525&geocode=44.977,-93.265&format=json' | jq
 
 
 https://gist.github.com/nbogie/985645/10bcafecb208552bf23781bda6fbd4ee3de9dac8
