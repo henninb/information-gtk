@@ -46,6 +46,7 @@ library
     , servant
     , servant-server
     , text
+    , time
     , transformers
     , unix
     , utf8-string
@@ -81,6 +82,7 @@ executable weather-gtk
     , servant
     , servant-server
     , text
+    , time
     , transformers
     , unix
     , utf8-string
@@ -117,6 +119,7 @@ test-suite weather-gtk-test
     , servant
     , servant-server
     , text
+    , time
     , transformers
     , unix
     , utf8-string

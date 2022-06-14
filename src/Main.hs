@@ -36,12 +36,6 @@ import Data.Typeable (typeOf)
 import Data.Aeson.Casing (aesonPrefix, pascalCase)
 import Data.Time (getCurrentTime)
 import Data.Time.Format
--- import Data.Time.Clock
--- import Data.Time.Calendar
--- date :: IO (Integer,Int,Int) -- :: (year,month,day)
--- date = getCurrentTime >>= return . toGregorian . utctDay
-
-
 
 type WeatherSchema = [schema|
   {
@@ -227,10 +221,6 @@ data V3WxObservationsCurrent = V3WxObservationsCurrent {
 fromJust (Just x) = x
 fromJust Nothing = error "Maybe.fromJust: Nothing"
 
--- dateFormat :: IO String
--- dateFormat = do
---   now <- getCurrentTime
---   return ( formatTime defaultTimeLocale "%Y%m%d" now)
 apiKey = "e1f10a1e78da46f5b10a1e78da96f525"
 
 forecastApi :: IO Value
@@ -244,17 +234,18 @@ forecastApi =
     "format" =: ("json" :: String)
   return (responseBody response)
 
-astroApi :: IO Value
-astroApi = do
-  now <- getCurrentTime
-  runReq defaultHttpConfig $ do
-  response <- req GET (https "api.weather.com" /: "v2" /: "astro") NoReqBody jsonResponse $
-      "apiKey" =: (apiKey :: String) <>
-      "geocode" =: ("45.18,-93.32" :: String) <>
-      "days" =: ("7" :: String) <>
-      "date" =: (formatTime defaultTimeLocale "%Y%m%d" now :: String) <>
-      "format" =: ("json" :: String)
-  return (responseBody response)
+-- TODO: fix
+-- astroApi :: IO Value
+-- astroApi = do
+--   -- runReq defaultHttpConfig $
+--   now <- getCurrentTime
+--   response <- req GET (https "api.weather.com" /: "v2" /: "astro") NoReqBody jsonResponse $
+--       "apiKey" =: (apiKey :: String) <>
+--       "geocode" =: ("45.18,-93.32" :: String) <>
+--       "days" =: ("7" :: String) <>
+--       "date" =: (formatTime defaultTimeLocale "%Y%m%d" now :: String) <>
+--       "format" =: ("json" :: String)
+--   return (responseBody response)
 
 weatherApi :: IO Value
 weatherApi =
@@ -281,12 +272,7 @@ fromJSONValue :: FromJSON a => Value -> Maybe a
 fromJSONValue = parseMaybe parseJSON
 
 
--- parseWeatherFromString :: String -> Maybe Weather
--- parseWeatherFromString s = let bs = pack s
---                        in case parse json bs of
---                                (Done rest r) -> parseMaybe parseJSON r :: Maybe Weather
---                                _             -> Nothing
-
+-- TODO: modify
 -- getObservation :: IO Observation
 -- getObservation = do
 --   payload <- getWeather
@@ -301,22 +287,9 @@ fromJSONValue = parseMaybe parseJSON
 getApiWeather :: IO Weather
 getApiWeather = do
   payload <- weatherApi
-  -- let xx = Data.Aeson.encode payload
-  -- print . typeOf $ xx
-  -- print response
   let justObservations = fromJSONValue payload :: Maybe Weather
   let observationList = (fromJust (justObservations))
   return (observationList)
-
--- getObservationPayload :: IO BL.ByteString
--- getObservationPayload = do
---   payload <- getWeather
---   return (Data.Aeson.encode payload)
-
--- getWeatherApiPayload :: IO BL.ByteString
--- getWeatherApiPayload = do
---   payload <- weatherApi
---   return (Data.Aeson.encode payload)
 
 replace :: Eq a => [a] -> [a] -> [a] -> [a]
 replace [] _ _ = []
@@ -326,8 +299,8 @@ replace s find repl =
         else [head s] ++ (replace (tail s) find repl)
 
 
-testmeToo :: IO (Object WeatherSchema)
-testmeToo = do
+getWeatherObservation :: IO (Object WeatherSchema)
+getWeatherObservation = do
   payload <- weatherApi
   let myPayload = Data.Aeson.encode payload -- (BL.ByteString)
   let payloadUpdated = BLU.toString myPayload
@@ -335,21 +308,6 @@ testmeToo = do
   let payloadx = BLU.fromString  ("{\"values\": " ++ payloadFinal ++ "}")
   output <- either fail return $ eitherDecode payloadx :: IO (Object WeatherSchema)
   return (output)
-
-zz :: IO T.Text
-zz = do
-  obs <- testmeToo
-  -- let x = pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]))
-  print . pack . show . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]
-  print . show . unpack . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]
-  print . fromString . unpack . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]
-  -- let x = pack . show . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]
-  let x = pack . show . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]
-  print (typeOf (head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]))
-  print (typeOf (show . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]))
-  print (typeOf (pack . show . head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]))
-  print (head $ [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |])
-  return (x)
 
 main :: IO ()
 main = do
@@ -451,12 +409,13 @@ main = do
   Gtk.onWidgetDestroy win Gtk.mainQuit
   #showAll win
 
-  obs <- testmeToo
+  obs <- getWeatherObservation
   -- observation <- getObservation
   -- let imperialData = (imperial observation)
   Gtk.labelSetMarkup temperatureLabel ("<b>" <> "Temperature: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |])) <> " F" <> "</b>")
   Gtk.labelSetMarkup pressureLabel ("<b>" <> "Pressure: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label5 ("<b>" <> "WindChill: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])) <> "" <> "</b>")
+  -- bh - wind gust returns a Just
   Gtk.labelSetMarkup label6 ("<b>" <> "WindGust: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label7 ("<b>" <> "WindSpeed: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label8 ("<b>" <> "HeatIndex: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureHeatIndex |])) <> "" <> "</b>")
@@ -464,15 +423,15 @@ main = do
   Gtk.labelSetMarkup label10 ("<b>" <> "Precipitation1: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip1Hour |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label11 ("<b>" <> "Precipitation6: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip6Hour |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label12 ("<b>" <> "Precipitation24: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip24Hour |])) <> "" <> "</b>")
-  Gtk.labelSetMarkup label13 ("<b>" <> "Sunrise: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunriseTimeLocal |])) <> "" <> "</b>")
-  Gtk.labelSetMarkup label14 ("<b>" <> "Sunset: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunsetTimeLocal |])) <> "" <> "</b>")
-  Gtk.labelSetMarkup label15 ("<b>" <> "Phrase: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.wxPhraseLong |])) <> "" <> "</b>")
-  Gtk.labelSetMarkup label16 ("<b>" <> "UV: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |])) <> "" <> "</b>")
+  Gtk.labelSetMarkup label13 ("<b>" <> "Sunrise: " <> (head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunriseTimeLocal |]) <> "" <> "</b>")
+  Gtk.labelSetMarkup label14 ("<b>" <> "Sunset: " <> (head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunsetTimeLocal |]) <> "" <> "</b>")
+  Gtk.labelSetMarkup label15 ("<b>" <> "Phrase: " <> (head [Data.Aeson.Schema.get| obs.values[].currentObservation.wxPhraseLong |]) <> "" <> "</b>")
+  Gtk.labelSetMarkup label16 ("<b>" <> "UV: " <>  (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]) <> "" <> "</b>")
   Gtk.labelSetMarkup label17 ("<b>" <> "UV Index: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvIndex |])) <> "" <> "</b>")
-  Gtk.labelSetMarkup label18 ("<b>" <> "Wind Direction: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windDirectionCardinal |])) <> "" <> "</b>")
+  Gtk.labelSetMarkup label18 ("<b>" <> "Wind Direction: " <> (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windDirectionCardinal |]) <> "" <> "</b>")
   Gtk.labelSetMarkup label19 ("<b>" <> "FeelsLike: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureFeelsLike |])) <> "" <> "</b>")
-  Gtk.labelSetMarkup label20 ("<b>" <> "Pressure Tendency: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureTendencyTrend |])) <> "" <> "</b>")
-  Gtk.labelSetMarkup label21 ("<b>" <> "Cloud Cover: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.cloudCoverPhrase |])) <> "" <> "</b>")
-  -- Gtk.labelSetMarkup label21 ("<b>" <> "Cloud Cover: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.cloudCoverPhrase |])) <> "" <> "</b>")
+  Gtk.labelSetMarkup label20 ("<b>" <> "Pressure Tendency: " <> (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureTendencyTrend |]) <> "" <> "</b>")
+  Gtk.labelSetMarkup label21 ("<b>" <> "Cloud Cover: " <> (head [Data.Aeson.Schema.get| obs.values[].currentObservation.cloudCoverPhrase |]) <> "" <> "</b>")
+  -- Gtk.labelSetMarkup label22 ("<b>" <> "NothingYet: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.something |])) <> "" <> "</b>")
 
   Gtk.main

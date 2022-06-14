@@ -4,6 +4,6 @@
 
 # stack build
 stack install
-stack run
+# stack run
 
 exit 0

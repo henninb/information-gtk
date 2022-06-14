@@ -33,6 +33,7 @@ dependencies:
 - pretty-simple
 - aeson-casing
 - utf8-string
+- time
 # - MissingH
 
 library:
