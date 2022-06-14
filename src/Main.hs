@@ -218,9 +218,15 @@ data V3WxObservationsCurrent = V3WxObservationsCurrent {
       wxPhraseShort:: String
 } deriving (Show, Generic, Eq, ToJSON, FromJSON, Typeable)
 
+fromJust :: Maybe a -> a
 fromJust (Just x) = x
-fromJust Nothing = error "Maybe.fromJust: Nothing"
+fromJust Nothing = error "Nothing"
 
+-- fromJustWindGust :: Maybe a -> a
+-- fromJustWindGust (Just x) = x
+-- fromJust Nothing = error 0
+
+apiKey :: String
 apiKey = "e1f10a1e78da46f5b10a1e78da96f525"
 
 forecastApi :: IO Value
@@ -351,6 +357,13 @@ main = do
   label20 <- Gtk.labelNew Nothing
   label21 <- Gtk.labelNew Nothing
   label22 <- Gtk.labelNew Nothing
+  label23 <- Gtk.labelNew Nothing
+  label24 <- Gtk.labelNew Nothing
+  label25 <- Gtk.labelNew Nothing
+  label26 <- Gtk.labelNew Nothing
+  label27 <- Gtk.labelNew Nothing
+  label28 <- Gtk.labelNew Nothing
+  label29 <- Gtk.labelNew Nothing
 
   -- temperatureLabel.modifyFont  "test"
   -- Gtk.labelModifyFont label5 "test"
@@ -403,6 +416,9 @@ main = do
   #attach grid label20 1 18 1 1
   #attach grid label21 1 19 1 1
   #attach grid label22 1 20 1 1
+  #attach grid label23 1 21 1 1
+  #attach grid label24 1 22 1 1
+  #attach grid label25 1 23 1 1
 
   #add win grid
 
@@ -416,7 +432,13 @@ main = do
   Gtk.labelSetMarkup pressureLabel ("<b>" <> "Pressure: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label5 ("<b>" <> "WindChill: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])) <> "" <> "</b>")
   -- bh - wind gust returns a Just
-  Gtk.labelSetMarkup label6 ("<b>" <> "WindGust: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])) <> "" <> "</b>")
+  let windGustJust = (head ([Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |]))
+  let windGust = fromJust windGustJust
+  -- print . typeOf $ windGust
+  -- print . typeOf $ x
+
+  Gtk.labelSetMarkup label6 ("<b>" <> "WindGust: " <> pack (show (windGust)) <> "" <> "</b>")
+  -- Gtk.labelSetMarkup label6 ("<b>" <> "WindGust: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label7 ("<b>" <> "WindSpeed: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label8 ("<b>" <> "HeatIndex: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureHeatIndex |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label9 ("<b>" <> "DewPoint: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureDewPoint |])) <> "" <> "</b>")
@@ -432,6 +454,9 @@ main = do
   Gtk.labelSetMarkup label19 ("<b>" <> "FeelsLike: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureFeelsLike |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label20 ("<b>" <> "Pressure Tendency: " <> (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureTendencyTrend |]) <> "" <> "</b>")
   Gtk.labelSetMarkup label21 ("<b>" <> "Cloud Cover: " <> (head [Data.Aeson.Schema.get| obs.values[].currentObservation.cloudCoverPhrase |]) <> "" <> "</b>")
+  Gtk.labelSetMarkup label22 ("<b>" <> "Snow1Hour: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow1Hour |])) <> "" <> "</b>")
+  Gtk.labelSetMarkup label23 ("<b>" <> "snow6Hour: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow6Hour |])) <> "" <> "</b>")
+  Gtk.labelSetMarkup label24 ("<b>" <> "snow24Hour: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow24Hour |])) <> "" <> "</b>")
   -- Gtk.labelSetMarkup label22 ("<b>" <> "NothingYet: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.something |])) <> "" <> "</b>")
 
   Gtk.main
