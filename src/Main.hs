@@ -43,8 +43,7 @@ type AstroSchema = [schema|
     language: Text
   }
   ,
-  astroData: List
-  {
+  astroData: List {
      dateLocal: Text,
      visibleLight: {
        hours: Int,
@@ -56,6 +55,31 @@ type AstroSchema = [schema|
        minutes: Int,
        seconds: Int
      },
+     tomorrowDaylightDifference: {
+       sign: Text,
+       minutes: Int,
+       seconds: Int
+     },
+     sun: {
+       riseSet: {
+         riseLocal: Text,
+         riseUTC: Text,
+         setLocal: Text,
+         setUTC: Text
+       }
+     },
+     moon: {
+       riseSet: {
+         riseLocal: Text,
+         riseUTC: Text,
+         setLocal: Text,
+         setUTC: Text,
+         risePhrase: Text,
+         setPhrase: Text,
+         moonage: Float,
+         percentIlluminated: Int
+       }
+     }
   }
 
   }
@@ -272,7 +296,7 @@ astroApi = do
       (https "api.weather.com" /: "v2" /: "astro") NoReqBody jsonResponse $
       "apiKey" =: (apiKey :: String) <>
       "geocode" =: ("45.18,-93.32" :: String) <>
-      "days" =: ("7" :: String) <>
+      "days" =: ("1" :: String) <>
       "date" =: (formatTime defaultTimeLocale "%Y%m%d" now :: String) <>
       "format" =: ("json" :: String)
     -- print (responseBody response :: Value)
