@@ -37,6 +37,14 @@ import Data.Aeson.Casing (aesonPrefix, pascalCase)
 import Data.Time (getCurrentTime)
 import Data.Time.Format
 
+type ForecastSchema = [schema|
+  {
+    metadata: {
+      language: Text
+    }
+  }
+|]
+
 type AstroSchema = [schema|
   {
   metadata: {
@@ -148,7 +156,7 @@ type WeatherSchema = [schema|
   }
 |]
 
-type MySchema = [schema|
+type ObservationSchema = [schema|
  {
   observations: List
     {
