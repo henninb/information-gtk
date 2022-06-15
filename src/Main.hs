@@ -80,6 +80,12 @@ type AstroSchema = [schema|
          percentIlluminated: Int
        }
      }
+  },
+  astroPhases: List {
+    date: Text,
+    moonPhase: Text,
+    moonAge: Float,
+    moonAgeFromPhase: Int
   }
 
   }
