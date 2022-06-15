@@ -37,6 +37,30 @@ import Data.Aeson.Casing (aesonPrefix, pascalCase)
 import Data.Time (getCurrentTime)
 import Data.Time.Format
 
+type AstroSchema = [schema|
+  {
+  metadata: {
+    language: Text
+  }
+  ,
+  astroData: List
+  {
+     dateLocal: Text,
+     visibleLight: {
+       hours: Int,
+       minutes: Int,
+       seconds: Int
+     },
+     lengthOfDay: {
+       hours: Int,
+       minutes: Int,
+       seconds: Int
+     },
+  }
+
+  }
+|]
+
 type WeatherSchema = [schema|
   {
   values: List
@@ -305,6 +329,13 @@ replace s find repl =
         then repl ++ (replace (drop (length find) s) find repl)
         else [head s] ++ (replace (tail s) find repl)
 
+
+getAstroObservation :: IO (Object AstroSchema)
+getAstroObservation = do
+  payload <- astroApi
+  let myPayload = Data.Aeson.encode payload
+  output <- either fail return $ eitherDecode myPayload :: IO (Object AstroSchema)
+  return (output)
 
 getWeatherObservation :: IO (Object WeatherSchema)
 getWeatherObservation = do
