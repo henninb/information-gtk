@@ -39,7 +39,7 @@ import Data.Time.Format
 
 type ForecastSchema = [schema|
   {
-    metadata: {
+  '': List   {
       language: Text
     }
   }
@@ -284,9 +284,9 @@ fromJust :: Maybe a -> a
 fromJust (Just x) = x
 fromJust Nothing = error "Nothing"
 
--- fromJustWindGust :: Maybe a -> a
--- fromJustWindGust (Just x) = x
--- fromJust Nothing = error 0
+fromIntJust :: Maybe Int -> Int
+fromIntJust (Just x) = x
+fromIntJust Nothing = 0
 
 apiKey :: String
 apiKey = "e1f10a1e78da46f5b10a1e78da96f525"
@@ -489,12 +489,15 @@ main = do
   #attach grid label23 1 21 1 1
   #attach grid label24 1 22 1 1
   #attach grid label25 1 23 1 1
+  #attach grid label26 1 24 1 1
+  #attach grid label27 1 25 1 1
 
   #add win grid
 
   Gtk.onWidgetDestroy win Gtk.mainQuit
   #showAll win
 
+  astroObs <- getAstroObservation
   obs <- getWeatherObservation
   -- observation <- getObservation
   -- let imperialData = (imperial observation)
@@ -503,7 +506,7 @@ main = do
   Gtk.labelSetMarkup label5 ("<b>" <> "WindChill: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])) <> "" <> "</b>")
   -- bh - wind gust returns a Just
   let windGustJust = (head ([Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |]))
-  let windGust = fromJust windGustJust
+  let windGust = fromIntJust windGustJust
   Gtk.labelSetMarkup label6 ("<b>" <> "WindGust: " <> pack (show (windGust)) <> "" <> "</b>")
   -- Gtk.labelSetMarkup label6 ("<b>" <> "WindGust: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label7 ("<b>" <> "WindSpeed: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])) <> "" <> "</b>")
@@ -524,6 +527,8 @@ main = do
   Gtk.labelSetMarkup label22 ("<b>" <> "Snow1Hour: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow1Hour |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label23 ("<b>" <> "snow6Hour: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow6Hour |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label24 ("<b>" <> "snow24Hour: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow24Hour |])) <> "" <> "</b>")
+  Gtk.labelSetMarkup label25 ("<b>" <> "Moon Rise: " <> (head [Data.Aeson.Schema.get| astroObs.astroData[].moon.riseSet.riseLocal |]) <> "" <> "</b>")
+  Gtk.labelSetMarkup label26 ("<b>" <> "Moon Set: " <> (head [Data.Aeson.Schema.get| astroObs.astroData[].moon.riseSet.setLocal |]) <> "" <> "</b>")
   -- Gtk.labelSetMarkup label22 ("<b>" <> "NothingYet: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.something |])) <> "" <> "</b>")
 
   Gtk.main
