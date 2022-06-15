@@ -292,9 +292,9 @@ apiKey :: String
 apiKey = "e1f10a1e78da46f5b10a1e78da96f525"
 
 forecastApi :: IO Value
-forecastApi =
-  runReq defaultHttpConfig $ do
-  response <- req GET (https "api.weather.com" /: "v3" /: "wx" /: "forecast" /: "daily" /: "10day") NoReqBody jsonResponse $
+forecastApi = do
+  response <- runReq defaultHttpConfig $ req
+    GET (https "api.weather.com" /: "v3" /: "wx" /: "forecast" /: "daily" /: "10day") NoReqBody jsonResponse $
     "apiKey" =: (apiKey :: String) <>
     "geocode" =: ("45.18,-93.32" :: String) <>
     "units" =: ("e" :: String) <>
@@ -317,9 +317,9 @@ astroApi = do
     return (responseBody response)
 
 weatherApi :: IO Value
-weatherApi =
-  runReq defaultHttpConfig $ do
-  response <- req GET (https "api.weather.com" /: "v3" /: "aggcommon" /: "v3-wx-observations-current") NoReqBody jsonResponse $
+weatherApi = do
+  response <- runReq defaultHttpConfig $ req
+     GET (https "api.weather.com" /: "v3" /: "aggcommon" /: "v3-wx-observations-current") NoReqBody jsonResponse $
     "apiKey" =: (apiKey :: String) <>
     "geocodes" =: ("45.18,-93.32" :: String) <>
     "units" =: ("e" :: String) <>
@@ -328,9 +328,9 @@ weatherApi =
   return (responseBody response)
 
 getWeather :: IO Value
-getWeather =
-  runReq defaultHttpConfig $ do
-  response <- req GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
+getWeather = do
+  response <- runReq defaultHttpConfig $ req
+    GET (https "api.weather.com" /: "v2" /: "pws" /: "observations" /: "current") NoReqBody jsonResponse $
     "apiKey" =: (apiKey :: String) <>
     "units" =: ("e" :: String) <>
     "stationId" =: ("KMNCOONR65" :: String) <>
