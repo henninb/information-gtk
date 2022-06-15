@@ -340,7 +340,6 @@ getWeather = do
 fromJSONValue :: FromJSON a => Value -> Maybe a
 fromJSONValue = parseMaybe parseJSON
 
-
 -- TODO: modify
 -- getObservation :: IO Observation
 -- getObservation = do
@@ -366,7 +365,6 @@ replace s find repl =
     if take (length find) s == find
         then repl ++ (replace (drop (length find) s) find repl)
         else [head s] ++ (replace (tail s) find repl)
-
 
 getAstroObservation :: IO (Object AstroSchema)
 getAstroObservation = do
