@@ -481,8 +481,7 @@ main = do
   Gtk.textViewSetEditable textView False
 
   textBuffer <- Gtk.getTextViewBuffer textView
-  Gtk.textBufferSetText textBuffer "matthew\nmaggie" (-1)
-  -- Gtk.textBufferSetText textBuffer "maggie" (-1)
+  -- Gtk.textBufferSetText textBuffer "matthew\nmaggie" (-1)
   Gtk.textViewSetBuffer textView (Just textBuffer)
 
   -- Gtk.textViewSetMarkup textView ""
@@ -574,16 +573,10 @@ main = do
 
   astroObs <- getAstroObservation
   obs <- getWeatherObservation
-  -- observation <- getObservation
-  -- let imperialData = (imperial observation)
   Gtk.labelSetMarkup temperatureLabel ("<b>" <> "Temperature: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |])) <> " F" <> "</b>")
   Gtk.labelSetMarkup pressureLabel ("<b>" <> "Pressure: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label5 ("<b>" <> "WindChill: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])) <> "" <> "</b>")
-  -- bh - wind gust returns a Just
-  let windGustJust = (head ([Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |]))
-  let windGust = fromIntJust windGustJust
-  Gtk.labelSetMarkup label6 ("<b>" <> "WindGust: " <> pack (show (windGust)) <> "" <> "</b>")
-  -- Gtk.labelSetMarkup label6 ("<b>" <> "WindGust: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])) <> "" <> "</b>")
+  Gtk.labelSetMarkup label6 ("<b>" <> "WindGust: " <> pack (show (fromIntJust (head ([Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])))) <> "" <> "</b>")
   Gtk.labelSetMarkup label7 ("<b>" <> "WindSpeed: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label8 ("<b>" <> "HeatIndex: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureHeatIndex |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label9 ("<b>" <> "DewPoint: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureDewPoint |])) <> "" <> "</b>")
@@ -604,6 +597,28 @@ main = do
   Gtk.labelSetMarkup label24 ("<b>" <> "snow24Hour: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow24Hour |])) <> "" <> "</b>")
   Gtk.labelSetMarkup label25 ("<b>" <> "Moon Rise: " <> (head [Data.Aeson.Schema.get| astroObs.astroData[].moon.riseSet.riseLocal |]) <> "" <> "</b>")
   Gtk.labelSetMarkup label26 ("<b>" <> "Moon Set: " <> (head [Data.Aeson.Schema.get| astroObs.astroData[].moon.riseSet.setLocal |]) <> "" <> "</b>")
-  -- Gtk.labelSetMarkup label22 ("<b>" <> "NothingYet: " <> pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.something |])) <> "" <> "</b>")
 
+  let myData = "Temperature: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |]))  ++ "\n" ++ "Pressure: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])) ++ "\n" ++ "WindChill: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])) ++ "\n" ++ "WindGust: " ++ (show (fromIntJust (head ([Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])))) ++ "\n"
+  --     ("WindSpeed: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])) ++ "" ++ "</b>") ++
+  --     ("HeatIndex: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureHeatIndex |])) ++ "" ++ "</b>") ++
+  --     ("DewPoint: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureDewPoint |])) ++ "" ++ "</b>") ++
+  --     ("Precipitation1: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip1Hour |])) ++ "" ++ "</b>") ++
+  --     ("Precipitation6: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip6Hour |])) ++ "" ++ "</b>") ++
+  --     ("Precipitation24: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip24Hour |])) ++ "" ++ "</b>") ++
+  --     ("Sunrise: " ++ (head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunriseTimeLocal |]) ++ "" ++ "</b>") ++
+  --     ("Sunset: " ++ (head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunsetTimeLocal |]) ++ "" ++ "</b>") ++
+  --     ("Phrase: " ++ (head [Data.Aeson.Schema.get| obs.values[].currentObservation.wxPhraseLong |]) ++ "" ++ "</b>") ++
+  --     ("UV: " ++  (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]) ++ "" ++ "</b>") ++
+  --     ("UV Index: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvIndex |])) ++ "" ++ "</b>") ++
+  --     ("Wind Direction: " ++ (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windDirectionCardinal |]) ++ "" ++ "</b>") ++
+  --     ("FeelsLike: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureFeelsLike |])) ++ "" ++ "</b>") ++
+  --     ("Pressure Tendency: " ++ (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureTendencyTrend |]) ++ "" ++ "</b>") ++
+  --     ("Cloud Cover: " ++ (head [Data.Aeson.Schema.get| obs.values[].currentObservation.cloudCoverPhrase |]) ++ "" ++ "</b>") ++
+  --     ("Snow1Hour: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow1Hour |])) ++ "" ++ "</b>") ++
+  --     ("snow6Hour: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow6Hour |])) ++ "" ++ "</b>") ++
+  --     ("snow24Hour: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow24Hour |])) ++ "" ++ "</b>") ++
+  --     ("Moon Rise: " ++ (head [Data.Aeson.Schema.get| astroObs.astroData[].moon.riseSet.riseLocal |]) ++ "" ++ "</b>") ++
+  --     ("Moon Set: " ++ (head [Data.Aeson.Schema.get| astroObs.astroData[].moon.riseSet.setLocal |]) ++ "" ++ "</b>")
+  -- Gtk.textBufferSetText textBuffer "matthew\nmaggie" (-1)
+  Gtk.textBufferSetText textBuffer (pack( myData)) (-1)
   Gtk.main
