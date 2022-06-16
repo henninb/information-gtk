@@ -37,6 +37,12 @@ import Data.Aeson.Casing (aesonPrefix, pascalCase)
 import Data.Time (getCurrentTime)
 import Data.Time.Format
 
+import qualified GI.Pango
+-- import qualified Graphics.Rendering.Pango.Enums as GRPF
+-- import qualified Graphics.Rendering.Pango.Font as GRPF
+-- import qualified Graphics.Rendering.Pango.Cairo as GRPC
+-- import qualified Graphics.Rendering.Pango.Layout as GRPL
+
 type ForecastSchema = [schema|
   {
   '': List   {
@@ -383,6 +389,12 @@ getWeatherObservation = do
   output <- either fail return $ eitherDecode payloadx :: IO (Object WeatherSchema)
   return (output)
 
+-- styles :: BL.ByteString
+styles = mconcat
+    [ ".title { font-size: large; margin: 5pt 10pt; }"
+    , ".exercise_reps { font-size: xx-large; font-family: monospace; margin: 10pt 5pt 15pt 5pt; }"
+    , "button { font-size: large; margin: 2pt 8pt; }"
+    ]
 -- printHello :: Gtk.TextView -> Gtk.Label -> IO ()
 -- printHello textView label =
 --     do
@@ -410,6 +422,12 @@ main = do
   Gtk.setWindowDefaultHeight win 225
   Gtk.setWindowWindowPosition win Gtk.WindowPositionCenter
   Gtk.windowSetDecorated win False
+
+  screen <- maybe (fail "No screen?!") return =<< GDK.screenGetDefault
+  p <- Gtk.cssProviderNew
+  Gtk.cssProviderLoadFromData p styles
+  Gtk.styleContextAddProviderForScreen screen p (fromIntegral Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
 
   img1 <- Gtk.imageNewFromFile $ home ++ "/.local/img/cancel.png"
 
@@ -445,6 +463,13 @@ main = do
   label28 <- Gtk.labelNew Nothing
   label29 <- Gtk.labelNew Nothing
 
+  -- newFontDesc      <- GRPF.fontDescriptionNew
+  -- let fontDesc     = fromMaybe newFontDesc textOverlayMaybeFontDesc
+  -- fontFamily       <-                       fromMaybe ""                 <$> GRPF.fontDescriptionGetFamily  fontDesc
+  -- fontStyle        <- removeQuotes . show . fromMaybe GRPF.StyleNormal   <$> GRPF.fontDescriptionGetStyle   fontDesc
+  -- fontStretch      <- removeQuotes . show . fromMaybe GRPF.StretchNormal <$> GRPF.fontDescriptionGetStretch fontDesc
+  -- fontWeight       <-                                                        getFontWeight                  fontDesc
+  -- fontSize         <-                       fromMaybe 30.0               <$> GRPF.fontDescriptionGetSize    fontDesc
   -- f <- Gtk.box Nothing
   -- only_grid <- Gtk.gridNew
   -- x <- Gtk.boxNew Nothing
@@ -456,7 +481,8 @@ main = do
   Gtk.textViewSetEditable textView False
 
   textBuffer <- Gtk.getTextViewBuffer textView
-  Gtk.textBufferSetText textBuffer "test" (-1)
+  Gtk.textBufferSetText textBuffer "matthew\nmaggie" (-1)
+  -- Gtk.textBufferSetText textBuffer "maggie" (-1)
   Gtk.textViewSetBuffer textView (Just textBuffer)
 
   -- Gtk.textViewSetMarkup textView ""

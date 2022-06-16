@@ -23,3 +23,5 @@ curl -s 'https://api.weather.com/v3/dateTime?apiKey=e1f10a1e78da46f5b10a1e78da96
 https://gist.github.com/nbogie/985645/10bcafecb208552bf23781bda6fbd4ee3de9dac8
 
 https://github.com/jaejin/haskell-workbook/blob/042e36b886a31d3bbce3b9defb963857eeb6e9cf/hello-gigtk/app/Main.hs
+
+https://github.com/lettier/gifcurry/blob/4070a99a464771c8e8df10b7ab2193aff81ae373/stack.yaml

@@ -31,10 +31,18 @@ library
     , base >=4.7 && <5
     , bytestring
     , directory
+    , gi-atk
+    , gi-cairo
     , gi-gdk
-    , gi-gtk ==3.0.*
+    , gi-gdkpixbuf
+    , gi-gio
+    , gi-glib
+    , gi-gobject
+    , gi-gtk
     , gi-gtk-hs
+    , gi-pango
     , hashmap
+    , haskell-gi
     , haskell-gi-base
     , http-client
     , json
@@ -67,10 +75,18 @@ executable weather-gtk
     , base >=4.7 && <5
     , bytestring
     , directory
+    , gi-atk
+    , gi-cairo
     , gi-gdk
-    , gi-gtk ==3.0.*
+    , gi-gdkpixbuf
+    , gi-gio
+    , gi-glib
+    , gi-gobject
+    , gi-gtk
     , gi-gtk-hs
+    , gi-pango
     , hashmap
+    , haskell-gi
     , haskell-gi-base
     , http-client
     , json
@@ -104,10 +120,18 @@ test-suite weather-gtk-test
     , base >=4.7 && <5
     , bytestring
     , directory
+    , gi-atk
+    , gi-cairo
     , gi-gdk
-    , gi-gtk ==3.0.*
+    , gi-gdkpixbuf
+    , gi-gio
+    , gi-glib
+    , gi-gobject
+    , gi-gtk
     , gi-gtk-hs
+    , gi-pango
     , hashmap
+    , haskell-gi
     , haskell-gi-base
     , http-client
     , json

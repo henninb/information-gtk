@@ -34,6 +34,21 @@ dependencies:
 - aeson-casing
 - utf8-string
 - time
+# - gi-pango
+- gi-atk
+- gi-gobject
+- gi-gio
+- gi-glib
+- gi-pango
+- gi-gdk
+- gi-gdkpixbuf
+- gi-gtk
+- gi-cairo
+
+- haskell-gi
+# - gi-gstbase
+# - gi-gst
+# - gi-gstvideo
 # - MissingH
 
 library:
