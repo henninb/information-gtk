@@ -383,6 +383,18 @@ getWeatherObservation = do
   output <- either fail return $ eitherDecode payloadx :: IO (Object WeatherSchema)
   return (output)
 
+-- printHello :: Gtk.TextView -> Gtk.Label -> IO ()
+-- printHello textView label =
+--     do
+--         buffer <- get textView #buffer
+--         text <- get buffer #text
+
+--         case text of
+--             Just a ->
+--                 do
+--                     Gtk.labelSetText label a
+--             Nothing -> putStrLn "ss"
+
 main :: IO ()
 main = do
   Gtk.init Nothing
@@ -432,6 +444,43 @@ main = do
   label27 <- Gtk.labelNew Nothing
   label28 <- Gtk.labelNew Nothing
   label29 <- Gtk.labelNew Nothing
+
+  -- f <- Gtk.box Nothing
+  -- only_grid <- Gtk.gridNew
+  -- x <- Gtk.boxNew Nothing
+  box <- Gtk.boxNew Gtk.OrientationHorizontal 0
+  input <- Gtk.entryNew
+  -- tt <- Gtk.newTextArea
+  -- textbuf <- Gtk.textBufferNew Gtk.OrientationHorizontal 0
+  textView <- Gtk.textViewNew
+  Gtk.textViewSetEditable textView False
+
+  textBuffer <- Gtk.getTextViewBuffer textView
+  Gtk.textBufferSetText textBuffer "test" (-1)
+  Gtk.textViewSetBuffer textView (Just textBuffer)
+
+  -- Gtk.textViewSetMarkup textView ""
+  -- Gtk.textViewSetBuffer textView (Just "test")
+  -- Gtk.textViewSetBuffer textView Nothing
+  -- textview1.Buffer.Text = "Some sample text that will be displayed."
+  buf <- Gtk.textViewGetBuffer textView
+  dialog <- Gtk.dialogNew
+  -- vbox <- Gtk.vBoxNew False 0
+  -- hbox <- Gtk.hBoxNew False 0
+  box <- Gtk.boxNew Gtk.OrientationHorizontal 0
+
+  Gtk.setBoxHomogeneous box False
+  Gtk.boxPackStart box textView True True 0
+
+
+  blackRgba                         <- GDK.newZeroRGBA
+  whiteRgba                         <- GDK.newZeroRGBA
+  _                                 <- GDK.rGBAParse blackRgba "rgba(0,0,0,1.0)"
+  _                                 <- GDK.rGBAParse whiteRgba "rgba(255,255,255,1.0)"
+  -- txtbuf <- Gtk.textBufferNew
+  -- txtview <- Gtk.textViewNewWithBuffer txtbuf
+  -- cbx <- Gtk.comboBoxNewText
+  -- vbox <- fmap Gtk.castToContainer (Gtk.dialogGetContentArea dialog)
 
   -- temperatureLabel.modifyFont  "test"
   -- Gtk.labelModifyFont label5 "test"
@@ -489,6 +538,8 @@ main = do
   #attach grid label25 1 23 1 1
   #attach grid label26 1 24 1 1
   #attach grid label27 1 25 1 1
+  -- #attach grid textView 0 2 1 1
+  #attach grid box 0 2 1 1
 
   #add win grid
 
