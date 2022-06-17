@@ -407,6 +407,13 @@ styles = mconcat
 --                     Gtk.labelSetText label a
 --             Nothing -> putStrLn "ss"
 
+textViewGetValue tv = do
+    buf <- Gtk.textViewGetBuffer tv
+    start <- Gtk.textBufferGetStartIter buf
+    end <- Gtk.textBufferGetEndIter buf
+    value <- Gtk.textBufferGetText buf start end True
+    return value
+
 main :: IO ()
 main = do
   Gtk.init Nothing
@@ -424,69 +431,39 @@ main = do
   Gtk.windowSetDecorated win False
 
   screen <- maybe (fail "No screen?!") return =<< GDK.screenGetDefault
-  p <- Gtk.cssProviderNew
-  Gtk.cssProviderLoadFromData p styles
-  Gtk.styleContextAddProviderForScreen screen p (fromIntegral Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
+  css <- Gtk.cssProviderNew
+  Gtk.cssProviderLoadFromData css styles
+  Gtk.styleContextAddProviderForScreen screen css (fromIntegral Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
   img1 <- Gtk.imageNewFromFile $ home ++ "/.local/img/cancel.png"
 
   label1 <- Gtk.labelNew Nothing
   Gtk.labelSetMarkup label1 ("<b>" <> "Done" <> "</b>")
 
-  -- newFontDesc      <- GRPF.fontDescriptionNew
-  -- let fontDesc     = fromMaybe newFontDesc textOverlayMaybeFontDesc
-  -- fontFamily       <-                       fromMaybe ""                 <$> GRPF.fontDescriptionGetFamily  fontDesc
-  -- fontStyle        <- removeQuotes . show . fromMaybe GRPF.StyleNormal   <$> GRPF.fontDescriptionGetStyle   fontDesc
-  -- fontStretch      <- removeQuotes . show . fromMaybe GRPF.StretchNormal <$> GRPF.fontDescriptionGetStretch fontDesc
-  -- fontWeight       <-                                                        getFontWeight                  fontDesc
-  -- fontSize         <-                       fromMaybe 30.0               <$> GRPF.fontDescriptionGetSize    fontDesc
-  -- f <- Gtk.box Nothing
-  -- only_grid <- Gtk.gridNew
-  -- x <- Gtk.boxNew Nothing
-  box <- Gtk.boxNew Gtk.OrientationHorizontal 0
-  input <- Gtk.entryNew
-  -- tt <- Gtk.newTextArea
-  -- textbuf <- Gtk.textBufferNew Gtk.OrientationHorizontal 0
+  -- input <- Gtk.entryNew
+  -- dialog <- Gtk.dialogNew
+  -- comboBox <- Gtk.comboBoxNew
+  -- blackRgba                         <- GDK.newZeroRGBA
+  -- whiteRgba                         <- GDK.newZeroRGBA
+  -- _                                 <- GDK.rGBAParse blackRgba "rgba(0,0,0,1.0)"
+  -- _                                 <- GDK.rGBAParse whiteRgba "rgba(255,255,255,1.0)"
+
+  lonLat <- Gtk.textViewNew
+  Gtk.textViewSetEditable lonLat True
+  textBufferLonLat <- Gtk.getTextViewBuffer lonLat
+  Gtk.textBufferSetText textBufferLonLat (( "45.18,-93.32")) (-1)
+
+  data1 <- textViewGetValue lonLat
+  print data1
+
   textView <- Gtk.textViewNew
   Gtk.textViewSetEditable textView False
 
   textBuffer <- Gtk.getTextViewBuffer textView
-  -- Gtk.textBufferSetText textBuffer "matthew\nmaggie" (-1)
-  Gtk.textViewSetBuffer textView (Just textBuffer)
-
-  -- Gtk.textViewSetMarkup textView ""
-  -- Gtk.textViewSetBuffer textView (Just "test")
-  -- Gtk.textViewSetBuffer textView Nothing
-  -- textview1.Buffer.Text = "Some sample text that will be displayed."
-  buf <- Gtk.textViewGetBuffer textView
-  dialog <- Gtk.dialogNew
-  -- vbox <- Gtk.vBoxNew False 0
-  -- hbox <- Gtk.hBoxNew False 0
   box <- Gtk.boxNew Gtk.OrientationHorizontal 0
 
   Gtk.setBoxHomogeneous box False
   Gtk.boxPackStart box textView True True 0
-
-
-  blackRgba                         <- GDK.newZeroRGBA
-  whiteRgba                         <- GDK.newZeroRGBA
-  _                                 <- GDK.rGBAParse blackRgba "rgba(0,0,0,1.0)"
-  _                                 <- GDK.rGBAParse whiteRgba "rgba(255,255,255,1.0)"
-  -- txtbuf <- Gtk.textBufferNew
-  -- txtview <- Gtk.textViewNewWithBuffer txtbuf
-  -- cbx <- Gtk.comboBoxNewText
-  -- vbox <- fmap Gtk.castToContainer (Gtk.dialogGetContentArea dialog)
-
-  -- temperatureLabel.modifyFont  "test"
-  -- Gtk.labelModifyFont label5 "test"
-  -- Gtk.widgetModifyFont label5 "test"
-
-  -- textbuf <- Gtk.textBufferNew Nothing
-  -- Gtk.widgetSetSizeRequest textarea 500 600
-  -- fdesc <- Gtk.fontDescriptionNew Nothing
-  -- Gtk.fontDescriptionSetFamily fdesc ("Mono" :: String)
-  -- Gtk.widgetModifyFont textarea (Just fdesc)
 
   btn1 <- Gtk.buttonNew
   Gtk.buttonSetRelief btn1 Gtk.ReliefStyleNone
@@ -509,33 +486,8 @@ main = do
 
   #attach grid btn1   0 0 1 1
   #attach grid label1 0 1 1 1
-  -- #attach grid temperatureLabel 1 1 1 1
-  -- #attach grid pressureLabel 1 2 1 1
-  -- #attach grid label5 1 3 1 1
-  -- #attach grid label6 1 4 1 1
-  -- #attach grid label7 1 5 1 1
-  -- #attach grid label8 1 6 1 1
-  -- #attach grid label9 1 7 1 1
-  -- #attach grid label10 1 8 1 1
-  -- #attach grid label11 1 9 1 1
-  -- #attach grid label12 1 10 1 1
-  -- #attach grid label13 1 11 1 1
-  -- #attach grid label14 1 12 1 1
-  -- #attach grid label15 1 13 1 1
-  -- #attach grid label16 1 14 1 1
-  -- #attach grid label17 1 15 1 1
-  -- #attach grid label18 1 16 1 1
-  -- #attach grid label19 1 17 1 1
-  -- #attach grid label20 1 18 1 1
-  -- #attach grid label21 1 19 1 1
-  -- #attach grid label22 1 20 1 1
-  -- #attach grid label23 1 21 1 1
-  -- #attach grid label24 1 22 1 1
-  -- #attach grid label25 1 23 1 1
-  -- #attach grid label26 1 24 1 1
-  -- #attach grid label27 1 25 1 1
-  -- #attach grid textView 0 2 1 1
   #attach grid box 0 2 1 1
+  #attach grid lonLat 0 3 1 1
 
   #add win grid
 
