@@ -598,8 +598,17 @@ main = do
   Gtk.labelSetMarkup label25 ("<b>" <> "Moon Rise: " <> (head [Data.Aeson.Schema.get| astroObs.astroData[].moon.riseSet.riseLocal |]) <> "" <> "</b>")
   Gtk.labelSetMarkup label26 ("<b>" <> "Moon Set: " <> (head [Data.Aeson.Schema.get| astroObs.astroData[].moon.riseSet.setLocal |]) <> "" <> "</b>")
 
-  let myData = "Temperature: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |]))  ++ "\n" ++ "Pressure: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])) ++ "\n" ++ "WindChill: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])) ++ "\n" ++ "WindGust: " ++ (show (fromIntJust (head ([Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])))) ++ "\n"
-  --     ("WindSpeed: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])) ++ "" ++ "</b>") ++
+  let temperature = "Temperature: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |]))  ++ "\n"
+  let pressure = "Pressure: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])) ++ "\n"
+  let windchill = "WindChill: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])) ++ "\n"
+  let windGust = "WindGust: " ++ (show (fromIntJust (head ([Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])))) ++ "\n"
+  let windSpeed = "WindSpeed: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])) ++ "\n"
+  let heatIndex = "HeatIndex: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureHeatIndex |])) ++ "\n"
+  let dewPoint = "DewPoint: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureDewPoint |])) ++ "\n"
+  let precip1Hour = "Precipitation1: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip1Hour |])) ++ "\n"
+
+
+  let myData = "Temperature: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |]))  ++ "\n" ++ "Pressure: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])) ++ "\n" ++ "WindChill: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])) ++ "\n" ++ "WindGust: " ++ (show (fromIntJust (head ([Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])))) ++ "\n" ++ "WindSpeed: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])) ++ "\n"
   --     ("HeatIndex: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureHeatIndex |])) ++ "" ++ "</b>") ++
   --     ("DewPoint: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureDewPoint |])) ++ "" ++ "</b>") ++
   --     ("Precipitation1: " ++ pack (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip1Hour |])) ++ "" ++ "</b>") ++
