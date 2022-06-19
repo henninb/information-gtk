@@ -37,12 +37,6 @@ import Data.Aeson.Casing (aesonPrefix, pascalCase)
 import Data.Time (getCurrentTime)
 import Data.Time.Format
 
-import qualified GI.Pango
--- import qualified Graphics.Rendering.Pango.Enums as GRPF
--- import qualified Graphics.Rendering.Pango.Font as GRPF
--- import qualified Graphics.Rendering.Pango.Cairo as GRPC
--- import qualified Graphics.Rendering.Pango.Layout as GRPL
-
 type ForecastSchema = [schema|
   {
   '': List   {
