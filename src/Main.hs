@@ -11,7 +11,7 @@
 module Main where
 
 import Data.GI.Base (get, on)
-import qualified GI.Gtk as Gtk
+import qualified GI.Gtk as Gtk (mainQuit, onWidgetDestroy, gridSetRowSpacing, gridNew, widgetDestroy, onWidgetDestroy, widgetSetHexpand, gridSetColumnHomogeneous, gridSetColumnSpacing, buttonSetRelief, boxNew, setBoxHomogeneous, buttonNew, buttonSetImage, boxPackStart, getTextViewBuffer, textViewNew, labelNew, labelSetMarkup, styleContextAddProviderForScreen, textViewSetEditable, textBufferSetText, textViewGetBuffer, init, windowNew, textBufferGetText, imageNewFromFile, cssProviderLoadFromData, textBufferGetStartIter, textBufferGetEndIter, setContainerBorderWidth, setWindowTitle, setWindowResizable, setWindowDefaultWidth, setWindowDefaultHeight, setWindowWindowPosition, cssProviderNew, windowSetDecorated, main, pattern ReliefStyleNone, pattern OrientationHorizontal, pattern WindowTypeToplevel, pattern WindowPositionCenter, pattern STYLE_PROVIDER_PRIORITY_USER)
 import GI.Gdk (screenGetDefault, keyvalToUnicode)
 import System.Directory (getHomeDirectory)
 import System.Posix.User (getEffectiveUserName)
