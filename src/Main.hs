@@ -350,22 +350,21 @@ getApiWeather :: IO Weather
 getApiWeather = do
   payload <- weatherApi
   let justObservations = fromJSONValue payload :: Maybe Weather
-  let observationList = (fromJust (justObservations))
-  return (observationList)
+  let observationList = fromJust justObservations
+  return observationList
 
 replace :: Eq a => [a] -> [a] -> [a] -> [a]
 replace [] _ _ = []
 replace s find repl =
     if take (length find) s == find
-        then repl ++ (replace (drop (length find) s) find repl)
-        else [head s] ++ (replace (tail s) find repl)
+        then repl ++ replace (drop (length find) s) find repl
+        else head s : replace (tail s) find repl
 
 getAstroObservation :: IO (Object AstroSchema)
 getAstroObservation = do
   payload <- astroApi
   let myPayload = Data.Aeson.encode payload
-  output <- either fail return $ eitherDecode myPayload :: IO (Object AstroSchema)
-  return (output)
+  either fail return $ eitherDecode myPayload :: IO (Object AstroSchema)
 
 getWeatherObservation :: IO (Object WeatherSchema)
 getWeatherObservation = do
@@ -374,8 +373,7 @@ getWeatherObservation = do
   let payloadUpdated = BLU.toString myPayload
   let payloadFinal = replace payloadUpdated "v3-wx-observations-current" "currentObservation"
   let payloadx = BLU.fromString  ("{\"values\": " ++ payloadFinal ++ "}")
-  output <- either fail return $ eitherDecode payloadx :: IO (Object WeatherSchema)
-  return (output)
+  either fail return $ eitherDecode payloadx :: IO (Object WeatherSchema)
 
 -- styles :: Data.ByteString.Internal.ByteString
 styles = mconcat
@@ -383,24 +381,11 @@ styles = mconcat
     , "textview { font-size: 25px; }"
     ]
 
--- printHello :: Gtk.TextView -> Gtk.Label -> IO ()
--- printHello textView label =
---     do
---         buffer <- get textView #buffer
---         text <- get buffer #text
-
---         case text of
---             Just a ->
---                 do
---                     Gtk.labelSetText label a
---             Nothing -> putStrLn "ss"
-
 textViewGetValue tv = do
     buf <- Gtk.textViewGetBuffer tv
     start <- Gtk.textBufferGetStartIter buf
     end <- Gtk.textBufferGetEndIter buf
-    value <- Gtk.textBufferGetText buf start end True
-    return value
+    Gtk.textBufferGetText buf start end True
 
 main :: IO ()
 main = do
@@ -439,7 +424,7 @@ main = do
   lonLat <- Gtk.textViewNew
   Gtk.textViewSetEditable lonLat True
   textBufferLonLat <- Gtk.getTextViewBuffer lonLat
-  Gtk.textBufferSetText textBufferLonLat (( "45.18,-93.32")) (-1)
+  Gtk.textBufferSetText textBufferLonLat "45.18,-93.32" (-1)
 
   data1 <- textViewGetValue lonLat
   print data1
@@ -485,32 +470,32 @@ main = do
   astroObs <- getAstroObservation
   obs <- getWeatherObservation
 
-  let temperature = "Temperature: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |]))  ++ "\n"
-  let pressure = "Pressure: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |])) ++ "\n"
-  let windChill = "WindChill: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |])) ++ "\n"
-  let windGust = "WindGust: " ++ (show (fromIntJust (head ([Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])))) ++ "\n"
-  let windSpeed = "WindSpeed: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |])) ++ "\n"
-  let heatIndex = "HeatIndex: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureHeatIndex |])) ++ "\n"
-  let dewPoint = "DewPoint: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureDewPoint |])) ++ "\n"
-  let precip1Hour = "Precipitation1: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip1Hour |])) ++ "\n"
-  let precip6Hour = "Precipitation6: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip6Hour |])) ++ "\n"
-  let precip24Hour = "Precipitation24: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip24Hour |])) ++ "\n"
+  let temperature = "Temperature: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperature |])  ++ "\n"
+  let pressure = "Pressure: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureAltimeter |]) ++ "\n"
+  let windChill = "WindChill: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureWindChill |]) ++ "\n"
+  let windGust = "WindGust: " ++ show (fromIntJust (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windGust |])) ++ "\n"
+  let windSpeed = "WindSpeed: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windSpeed |]) ++ "\n"
+  let heatIndex = "HeatIndex: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureHeatIndex |]) ++ "\n"
+  let dewPoint = "DewPoint: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureDewPoint |]) ++ "\n"
+  let precip1Hour = "Precipitation1: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip1Hour |]) ++ "\n"
+  let precip6Hour = "Precipitation6: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip6Hour |]) ++ "\n"
+  let precip24Hour = "Precipitation24: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.precip24Hour |]) ++ "\n"
   let sunRise = "Sunrise: " ++ unpack (head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunriseTimeLocal |]) ++ "\n"
   let sunSet = "Sunset: " ++ unpack(head [Data.Aeson.Schema.get| obs.values[].currentObservation.sunsetTimeLocal |]) ++ "\n"
   let phrase = "Phrase: " ++ unpack (head [Data.Aeson.Schema.get| obs.values[].currentObservation.wxPhraseLong |]) ++ "\n"
   let uv = "UV: " ++  unpack (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvDescription |]) ++ "\n"
-  let uvIndex = "UV Index: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvIndex |])) ++ "\n"
+  let uvIndex = "UV Index: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.uvIndex |]) ++ "\n"
   let windDirection = "Wind Direction: " ++ unpack (head [Data.Aeson.Schema.get| obs.values[].currentObservation.windDirectionCardinal |]) ++ "\n"
-  let feelsLike = "FeelsLike: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureFeelsLike |])) ++ "\n"
+  let feelsLike = "FeelsLike: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.temperatureFeelsLike |]) ++ "\n"
   let pressureTendency = "Pressure Tendency: " ++ unpack (head [Data.Aeson.Schema.get| obs.values[].currentObservation.pressureTendencyTrend |]) ++ "\n"
   let cloudCover = "Cloud Cover: " ++ unpack (head [Data.Aeson.Schema.get| obs.values[].currentObservation.cloudCoverPhrase |]) ++ "\n"
-  let snow1Hour = "Snow1Hour: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow1Hour |])) ++ "\n"
-  let snow6Hour = "snow6Hour: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow6Hour |])) ++ "\n"
-  let snow24Hour = "snow24Hour: " ++ (show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow24Hour |])) ++ "\n"
+  let snow1Hour = "Snow1Hour: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow1Hour |]) ++ "\n"
+  let snow6Hour = "snow6Hour: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow6Hour |]) ++ "\n"
+  let snow24Hour = "snow24Hour: " ++ show (head [Data.Aeson.Schema.get| obs.values[].currentObservation.snow24Hour |]) ++ "\n"
   let moonRise = "Moon Rise: " ++ unpack (head [Data.Aeson.Schema.get| astroObs.astroData[].moon.riseSet.riseLocal |]) ++ "\n"
   let moonSet = "Moon Set: " ++ unpack (head [Data.Aeson.Schema.get| astroObs.astroData[].moon.riseSet.setLocal |]) ++ "\n"
 
   let myData = temperature ++ pressure ++ windChill ++ windGust ++ windSpeed ++ heatIndex ++ dewPoint ++ precip1Hour ++ precip6Hour ++ precip24Hour ++ sunRise ++ sunSet ++ phrase ++ uv ++ uvIndex ++ windDirection ++ feelsLike ++ pressureTendency ++ cloudCover ++ snow1Hour ++ snow6Hour ++ snow24Hour ++ moonRise ++ moonSet
   --
-  Gtk.textBufferSetText textBuffer (pack( myData)) (-1)
+  Gtk.textBufferSetText textBuffer (pack myData) (-1)
   Gtk.main
