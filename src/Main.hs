@@ -6,12 +6,13 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE PatternSynonyms #-}
 
 module Main where
 
-import Data.GI.Base
+import Data.GI.Base (get, on)
 import qualified GI.Gtk as Gtk
-import qualified GI.Gdk as GDK
+import GI.Gdk (screenGetDefault, keyvalToUnicode)
 import System.Directory (getHomeDirectory)
 import System.Posix.User (getEffectiveUserName)
 import Data.Char (chr)
@@ -19,23 +20,16 @@ import Data.Aeson (eitherDecode, encode, eitherDecodeStrict)
 import Data.Aeson.Types (ToJSON, FromJSON, Value, parseJSON, parseMaybe)
 import GHC.Generics (Generic)
 import Data.String ( fromString )
--- import Network.HTTP.Req (JsonResponse, jsonResponse, responseBody, (/:), defaultHttpConfig, (=:), https, runReq, req, NoReqBody, GET)
-import Network.HTTP.Req
-import qualified Data.ByteString.Lazy.UTF8 as BLU -- from utf8-string
-import qualified Data.ByteString.Lazy as BL
-
-import Data.Text.Encoding
-import qualified Data.Text as T
+import Network.HTTP.Req (JsonResponse, jsonResponse, responseBody, (/:), defaultHttpConfig, (=:), https, runReq, req, pattern NoReqBody, pattern GET)
+import qualified Data.ByteString.Lazy.UTF8 as BLU (fromString, toString)
 import Data.Text (pack, unpack)
 import Text.JSON.Generic (Typeable)
--- import qualified Data.Aeson.Schema as DAS
 import Data.Aeson.Schema (schema, Object, get)
 import Data.Aeson.Casing.Internal (snakeCase)
 import Data.Typeable (typeOf)
-
 import Data.Aeson.Casing (aesonPrefix, pascalCase)
 import Data.Time (getCurrentTime)
-import Data.Time.Format
+import Data.Time.Format (defaultTimeLocale, formatTime)
 
 type ForecastSchema = [schema|
   {
@@ -424,7 +418,7 @@ main = do
   Gtk.setWindowWindowPosition win Gtk.WindowPositionCenter
   Gtk.windowSetDecorated win False
 
-  screen <- maybe (fail "No screen?!") return =<< GDK.screenGetDefault
+  screen <- maybe (fail "No screen?!") return =<< screenGetDefault
   css <- Gtk.cssProviderNew
   Gtk.cssProviderLoadFromData css styles
   Gtk.styleContextAddProviderForScreen screen css (fromIntegral Gtk.STYLE_PROVIDER_PRIORITY_USER)
@@ -437,10 +431,10 @@ main = do
   -- input <- Gtk.entryNew
   -- dialog <- Gtk.dialogNew
   -- comboBox <- Gtk.comboBoxNew
-  -- blackRgba                         <- GDK.newZeroRGBA
-  -- whiteRgba                         <- GDK.newZeroRGBA
-  -- _                                 <- GDK.rGBAParse blackRgba "rgba(0,0,0,1.0)"
-  -- _                                 <- GDK.rGBAParse whiteRgba "rgba(255,255,255,1.0)"
+  -- blackRgba                         <- newZeroRGBA
+  -- whiteRgba                         <- newZeroRGBA
+  -- _                                 <- rGBAParse blackRgba "rgba(0,0,0,1.0)"
+  -- _                                 <- rGBAParse whiteRgba "rgba(255,255,255,1.0)"
 
   lonLat <- Gtk.textViewNew
   Gtk.textViewSetEditable lonLat True
@@ -468,7 +462,7 @@ main = do
     Gtk.widgetDestroy win
 
   on win #keyPressEvent $ \keyEvent -> do
-    key <- keyEvent `Data.GI.Base.get` #keyval >>= GDK.keyvalToUnicode
+    key <- keyEvent `Data.GI.Base.get` #keyval >>= keyvalToUnicode
     putStrLn $ "Key pressed: (" ++ show key ++ ")"
     if key == 27 then Gtk.mainQuit else pure ()
     return False
