@@ -25,3 +25,16 @@ https://gist.github.com/nbogie/985645/10bcafecb208552bf23781bda6fbd4ee3de9dac8
 https://github.com/jaejin/haskell-workbook/blob/042e36b886a31d3bbce3b9defb963857eeb6e9cf/hello-gigtk/app/Main.hs
 
 https://github.com/lettier/gifcurry/blob/4070a99a464771c8e8df10b7ab2193aff81ae373/stack.yaml
+
+
+
+gi-harfbuzz                      > [64 of 68] Compiling GI.HarfBuzz.Functions
+cryptonite                       > [  3 of 137] Compiling Crypto.Error.Types
+gi-harfbuzz                      >
+gi-harfbuzz                      > /tmp/stack-bf9b9b3190f16ea3/gi-harfbuzz-0.0.5/GI/HarfBuzz/Functions.hs:1772:1: error:
+gi-harfbuzz                      >     Could not find module ‘GI.Freetype2.Structs.Face’
+gi-harfbuzz                      >     Use -v (or `:set -v` in ghci) to see a list of the files searched for.
+gi-harfbuzz                      >      |
+gi-harfbuzz                      > 1772 | import qualified GI.Freetype2.Structs.Face as Freetype2.Face
+gi-harfbuzz                      >      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asn1-types                       > copy/register
