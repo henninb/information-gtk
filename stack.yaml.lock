@@ -3,11 +3,25 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: gi-freetype2-2.0.1@sha256:86c6104db20113532739e268cd74000553fd5b80aaab85b4dbfa3d7b65ef74d2,2739
+    pantry-tree:
+      size: 306
+      sha256: eef5da8c17384a131ea200b4094843dd67b827a361843d4f14376b363fdb2156
+  original:
+    hackage: gi-freetype2-2.0.1@sha256:86c6104db20113532739e268cd74000553fd5b80aaab85b4dbfa3d7b65ef74d2,2739
+- completed:
+    hackage: gi-harfbuzz-0.0.6@sha256:c3f90157c220ba9aa8d1e221e5d7d73c528dac62fa4866058432c7dc14f76c90,6512
+    pantry-tree:
+      size: 364
+      sha256: 1c26234a2de28fac847086802bdaa3a973b9f852141c2fc52ae9bc4ae0df5ac3
+  original:
+    hackage: gi-harfbuzz-0.0.6@sha256:c3f90157c220ba9aa8d1e221e5d7d73c528dac62fa4866058432c7dc14f76c90,6512
 snapshots:
 - completed:
-    sha256: 57d4ce67cc097fea2058446927987bc1f7408890e3a6df0da74e5e318f051c20
-    size: 618884
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/7.yaml
+    size: 618952
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/15.yaml
+    sha256: 82e5ccb47b068521de4055034e8aa278eab430b586881d9cc29ba8b382ce3253
   original:
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/7.yaml
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/15.yaml

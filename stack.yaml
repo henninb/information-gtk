@@ -18,7 +18,7 @@
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
 resolver:
-  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/7.yaml
+  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/15.yaml
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -65,3 +65,6 @@ packages:
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+extra-deps:
+- gi-freetype2-2.0.1@sha256:86c6104db20113532739e268cd74000553fd5b80aaab85b4dbfa3d7b65ef74d2,2739
+- gi-harfbuzz-0.0.6@sha256:c3f90157c220ba9aa8d1e221e5d7d73c528dac62fa4866058432c7dc14f76c90,6512
