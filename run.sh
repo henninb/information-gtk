@@ -2,6 +2,8 @@
 
 # stack run
 
+sudo pacman -S gobject-introspection
+
 hlint src/Main.hs
 # stack build
 stack install
