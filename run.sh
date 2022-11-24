@@ -2,7 +2,7 @@
 
 # stack run
 
-sudo pacman -S gobject-introspection
+sudo pacman --noconfirm --needed -S gobject-introspection
 
 hlint src/Main.hs
 # stack build
