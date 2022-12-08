@@ -3,6 +3,7 @@
 # stack run
 
 sudo pacman --noconfirm --needed -S gobject-introspection
+sudo dnf install -y gobject-introspection-devel
 
 hlint src/Main.hs
 # stack build
