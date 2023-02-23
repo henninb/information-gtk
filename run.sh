@@ -9,6 +9,7 @@ elif command -v apt; then
   sudo apt install -y libpango1.0-dev
   sudo apt install -y libgdk-pixbuf-2.0-dev
   sudo apt install -y libgirepository1.0-dev
+  sudo apt install -y libgtk-3-dev
 elif command -v dnf; then
   sudo dnf install -y gobject-introspection-devel
   sudo dnf install -y cairo-gobject-devel
